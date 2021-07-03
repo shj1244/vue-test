@@ -3,13 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "build": "vue-cli-service build",
     "dev": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "start": "nodemon server/server.js"
   },
   "dependencies": {
     "@babel/polyfill": "^7.4.4",
     "@mdi/font": "5.9.55",
     "core-js": "^3.6.5",
+    "mysql2": "^2.2.5",
     "roboto-fontface": "*",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",
