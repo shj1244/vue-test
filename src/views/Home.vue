@@ -8,6 +8,12 @@
       <v-btn @click="toastTest4">토스트 warning</v-btn>
       <v-btn @click="toastTest5">토스트 전역에러</v-btn>
     </div>
+    <h1>프로그래스바 테스트</h1>
+    <div>
+      <v-btn @click="progresTest1">프로그래스바 start</v-btn>
+      <v-btn @click="progresTest2">프로그래스바 finish</v-btn>
+      <v-btn @click="progresTest3">프로그래스바 fail</v-btn>
+    </div>
   </div>
 </template>
 
@@ -29,6 +35,16 @@ export default {
     },
     toastTest5() {
       throw new Error('토스트 에러발생');
+    },
+
+    progresTest1 () {
+        this.$Progress.start()
+    },
+    progresTest2 () {
+        this.$Progress.finish()
+    },
+    progresTest3 () {
+        this.$Progress.fail()
     }
     
   }
