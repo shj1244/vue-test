@@ -26,13 +26,15 @@ export function createRouter() {
 		base: process.env.BASE_URL,
 		routes
 	});
+
+  router.beforeEach((to, from, next)=>{
+    console.log('router.js beforeEach');
+    next();
+  });
+  
+  router.afterEach((to, from)=>{
+    console.log('router.js afterEach');
+  });
+
 	return router;
 }
-
-const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
-  routes
-})
-
-export default router
