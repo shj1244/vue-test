@@ -1,39 +1,21 @@
 <template>
   <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
-    >
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
+    <v-navigation-drawer app v-model="drawer" :width="drawerWidth">
+      <site-navi@close="toggleDrawer"/>
+    </v-navigation-drawer>
 
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
-
+    <v-app-bar app color="primary" dark hide-on-scroll>
+      <v-app-bar-nav-icon @click="toggleDrawer"/>
+      <site-title></site-title>
       <v-spacer></v-spacer>
-
-      <v-btn to="/">home</v-btn>
-      <v-btn to="/about">about</v-btn>
+      
     </v-app-bar>
 
     <v-main>
       <router-view/>
     </v-main>
+
+    <site-footer/>
 
     <vue-progress-bar></vue-progress-bar>
 
@@ -41,31 +23,27 @@
 </template>
 
 <script>
+import SiteFooter from './components/layout/SiteFooter.vue';
+import SiteTitle from './components/layout/SiteTitle2.vue';
+import SiteNavi from './components/layout/SiteNavi.vue';
 
 export default {
   name: 'App',
-
-  data: () => ({
-    //
-  }),
-  beforeCreate(){
-    console.log('App.vue beforeCreate');
+  components:{SiteTitle,SiteFooter,SiteNavi},
+  data(){
+    return{
+      drawer : false,
+    }
   },
-  created(){
-    console.log('App.vue created', this.$ssrContext);
-  },
-  beforeMount(){
-    console.log('App.vue beforeMount');
-  },
-  mounted(){
-    console.log('App.vue mounted');
-  },
-  serverPrefetch(){
-    console.log('App.vue serverPrefetch');
-    return new Promise((resolve, reject)=>{
-      console.log('App.vue serverPrefetch Promise');
-      resolve();
-    })
+  computed : {
+    drawerWidth(){
+      return this.$vuetify.breakpoint.xs? '100%' : '360';
+    }
+  },  
+  methods : {
+    toggleDrawer(){
+      this.drawer = !this.drawer;
+    }
   },
 };
 </script>
