@@ -7,6 +7,7 @@ import vuetify from './plugins/vuetify'
 import '@babel/polyfill'
 import 'roboto-fontface/css/roboto/roboto-fontface.css'
 import '@mdi/font/css/materialdesignicons.css'
+import titleMixin from './mixins/title-mixin';
 
 
 Vue.config.productionTip = false
@@ -15,6 +16,9 @@ export function createApp(ctx){
   const router = createRouter();
   const store = createStore();
   sync(store, router);
+
+  Vue.mixin(titleMixin);
+
   const app = new Vue({
     date : {url:ctx ? ctx.url : ''},
     router,

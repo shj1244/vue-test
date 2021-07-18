@@ -28,7 +28,16 @@
 
 
 export default {
-  name: 'Home',
+  name: "Home",
+  title(){
+    return this.title
+  },
+  data(){
+    return {
+      title : "My Home"
+    }
+  },
+
   methods : {
     
     toastTest1() {
