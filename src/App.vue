@@ -8,6 +8,7 @@
       <v-app-bar-nav-icon @click="toggleDrawer"/>
       <site-title></site-title>
       <v-spacer></v-spacer>
+      <site-user></site-user>
       
     </v-app-bar>
 
@@ -26,10 +27,11 @@
 import SiteFooter from './components/layout/SiteFooter.vue';
 import SiteTitle from './components/layout/SiteTitle2.vue';
 import SiteNavi from './components/layout/SiteNavi.vue';
+import SiteUser from './components/layout/SiteUser.vue';
 
 export default {
   name: 'App',
-  components:{SiteTitle,SiteFooter,SiteNavi},
+  components:{SiteTitle,SiteFooter,SiteNavi, SiteUser},
   data(){
     return{
       drawer : false,
