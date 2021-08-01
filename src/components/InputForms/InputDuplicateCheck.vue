@@ -63,7 +63,7 @@ export default {
     },
     methods : {
         onInput(val){
-            console.log(val);
+            //console.log(val);
             this.isCheck = this.origin ? this.origin === val : !this.cbCheck;
             this.errMsg = "";
             this.successMsg = "";

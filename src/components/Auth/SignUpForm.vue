@@ -9,6 +9,37 @@
       :rules="rules.id()"
       :cbCheck="cbCheckId"
     />
+
+    <v-text-field
+      label="이름"
+      v-model="form.mb_name"
+      prepend-icon="mdi=card-account-details-outline"
+      :rules="rules.name()"
+    />
+
+    <input-password
+      label="비밀번호"
+      prepend-icon="mdi-lock"
+      v-model="form.mb_password"
+      :rules="[...rules.password()]"
+    />
+
+    <input-password
+      label="비밀번호 확인"
+      prepend-icon="mdi-lock-check"
+      v-model="confirmPw"
+      :rules="[rules.matchValue(form.mb_password)]"
+    />
+
+    <input-duplicate-check
+      ref="email"
+      label="이메일"
+      prepend-icon="mdi-email"
+      v-model="form.mb_email"
+      :rules="rules.email()"
+      :cbCheck="cbCheckEmail"
+    />
+
     <v-btn type="submit" block color="primary">회원가입</v-btn>
   </v-form>
 </template>
@@ -16,14 +47,19 @@
 <script>
 import InputDuplicateCheck from '../InputForms/InputDuplicateCheck.vue';
 import validateRules from "../../../util/validateRules";
+import InputPassword from '../InputForms/inputPassword.vue';
 export default {
-  components: { InputDuplicateCheck },
+  components: { InputDuplicateCheck, InputPassword },
     name : "SignUpForm",
     props : {
       cbCheckId :{
         type :Function,
         default : null,
-      }
+      },
+      cbCheckEmail :{
+        type :Function,
+        default : null,
+      },
     },
     data(){
         return{   
@@ -40,6 +76,7 @@ export default {
                 mb_addr1 : "",
                 mb_addr2 : "",
             },
+            confirmPw : "",
         }
     },
     computed : {
@@ -53,6 +90,7 @@ export default {
           console.log("2222222222222222222222222222222222")
           if(!this.$refs.id.validate()) return;
           console.log("3333333333333333333333333333333")
+          if(!this.$refs.email.validate()) return;
           console.log(this.form);
       }
     },
