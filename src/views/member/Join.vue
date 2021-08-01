@@ -12,19 +12,19 @@
 </template>
 
 <script>
+import {mapActions} from 'vuex';
 import SignUpForm from "../../components/Auth/SignUpForm.vue";
-
 export default {
   components: { SignUpForm },
     name : "Join",
     methods: {
+        ...mapActions('user',['duplicateCheck']),
         async checkId(id) {
-            console.log("id",id);
-            return {cnt : 0}
+            const data = await this.duplicateCheck({field: 'mb_id', value:id});
+            return data
         }
-    }
-    
-}
+    }  
+};
 </script>
 
 <style>
