@@ -13,7 +13,7 @@
     <v-text-field
       label="이름"
       v-model="form.mb_name"
-      prepend-icon="mdi=card-account-details-outline"
+      prepend-icon="mdi-card-account-details-outline"
       :rules="rules.name()"
     />
 
@@ -40,6 +40,13 @@
       :cbCheck="cbCheckEmail"
     />
 
+    <input-date 
+      v-model="form.mb_birth" 
+      label="생년월일" 
+      prepend-icon="mdi-calendar"
+      :rules="rules.date({label:'생년월일'})"
+    />
+
     <v-btn type="submit" block color="primary">회원가입</v-btn>
   </v-form>
 </template>
@@ -48,8 +55,9 @@
 import InputDuplicateCheck from '../InputForms/InputDuplicateCheck.vue';
 import validateRules from "../../../util/validateRules";
 import InputPassword from '../InputForms/inputPassword.vue';
+import InputDate from '../InputForms/inputDate.vue';
 export default {
-  components: { InputDuplicateCheck, InputPassword },
+  components: { InputDuplicateCheck, InputPassword, InputDate },
     name : "SignUpForm",
     props : {
       cbCheckId :{
