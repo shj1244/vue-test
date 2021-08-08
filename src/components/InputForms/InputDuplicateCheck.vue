@@ -70,13 +70,13 @@ export default {
             this.$emit('input',val)
         },
         async check(){  
-            console.log("check this.isSend==========>", this.isSend); 
+            //console.log("check this.isSend==========>", this.isSend); 
             if(!this.isSend) return;
             //if(this.cbCheck) return;
             this.loading = true;
             this.errMsg = "";
             this.successMsg = "";
-            console.log("input===============================>")  
+            //console.log("input===============================>")  
             const data = await this.cbCheck(this.value);
             console.log("data.cnt===>",data)  
             if(data && data.cnt == 0) {

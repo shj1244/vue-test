@@ -11,7 +11,7 @@
       <!-- 메뉴가 보이는거 -->
       <v-card>
           <v-card-text>
-              <v-switch label="Dark Theme" @change="setDarkMode($event)"></v-switch>
+              <v-switch label="Dark Theme" :input-value="darkMode" @change="setDarkMode($event)"></v-switch>
           </v-card-text>
           <v-card-actions>
               <v-btn to="/login" color="primary" block>로그인</v-btn>

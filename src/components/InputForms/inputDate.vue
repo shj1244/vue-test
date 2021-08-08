@@ -56,7 +56,7 @@ export default {
         },
         open(){
             
-            this.date= /^\d(4)-\d(2)-\d(2)$/
+            const pattern = /^\d{4}-\d{2}-\d{2}$/
             this.date = pattern.test(this.value) ? this.value : "";
             this.modal = true;
                        
@@ -65,7 +65,8 @@ export default {
             this.$emit('input', this.date);
             this.modal = false;
         },
-        dayFomat(day){
+        dayFomat(day){            
+            if (!this.modal) return;
             console.log(day)
             const arr = day.split('-');
             return Number(arr[arr.length-1]);

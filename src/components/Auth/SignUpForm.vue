@@ -62,7 +62,15 @@
       :rules="rules.phone()"
     />
 
-    <v-btn type="submit" block color="primary">회원가입</v-btn>
+    <input-post
+      :zipcode.sync="form.mb_zip"
+      :addr1.sync="form.mb_addr1"
+      :addr2.sync="form.mb_addr2"
+    />
+
+    <v-btn type="submit" block color="primary" :loading="isLoading">
+      회원가입
+    </v-btn>
   </v-form>
 </template>
 
@@ -73,11 +81,16 @@ import InputPassword from '../InputForms/inputPassword.vue';
 import InputDate from '../InputForms/inputDate.vue';
 import InputRadio from '../InputForms/inputRadio.vue';
 import InputPhone from '../InputForms/inputPhone.vue';
+import InputPost from '../InputForms/inputPost.vue';
 
 export default {
-  components: { InputDuplicateCheck, InputPassword, InputDate, InputRadio, InputPhone },
+  components: { InputDuplicateCheck, InputPassword, InputDate, InputRadio, InputPhone, InputPost },
     name : "SignUpForm",
     props : {
+      isLoading : {
+        type : Boolean,
+        required : true,
+      },
       cbCheckId :{
         type :Function,
         default : null,
@@ -98,15 +111,15 @@ export default {
                 mb_gender : "M",
                 mb_email : "test@test.com",
                 mb_phone : "010-1111-1111",
-                mb_zip : "",
-                mb_addr1 : "",
-                mb_addr2 : "",
+                mb_zip : "04538",
+                mb_addr1 : "서울 중구 삼일대로 343 (저동1가, 대신파이낸스센터(Daishin Finance Center))",
+                mb_addr2 : "21층 it개발부",
             },
             genderItems : [
               {label : "남자" , value : "M"},
               {label : "여자" , value : "F"},
             ],
-            confirmPw : "",
+            confirmPw : "abcd1234",
         }
     },
     computed : {
@@ -119,6 +132,8 @@ export default {
           if(!this.valid) return;
           if(!this.$refs.id.validate()) return;
           if(!this.$refs.email.validate()) return;
+          this.loading = true;
+          this.$emit("onSave", this.form);
           console.log(this.form);
       }
     },

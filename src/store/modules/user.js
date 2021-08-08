@@ -19,5 +19,8 @@ export const actions = {
         const data = await $axios.get(`/api/member/duplicateCheck/${field}/${value}`);
         //console.log('data',data );
         return data;
+    },
+    async createMember(ctx, form){
+        console.log('user', form);
     }
 }
