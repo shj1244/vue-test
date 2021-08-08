@@ -9,6 +9,10 @@ const app = express();
 const port = process.env.VUE_APP_SERVER_PORT || 3000;
 const webServer = http.createServer(app);
 
+// 파서
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
+
 // 정적 폴더
 app.use(express.static(path.join(__dirname, "../dist")));
 
@@ -22,6 +26,7 @@ app.use('/api/*', (req, res) => {
 
 // Vue SSR
 const { createBundleRenderer } = require('vue-server-renderer');
+const exp = require('constants');
 const template = fs.readFileSync(path.join(__dirname, 'index.template.html'), 'utf-8');
 const serverBundle = require(path.join(__dirname, '../dist/vue-ssr-server-bundle.json'));
 const clientManifest = require(path.join(__dirname, '../dist/vue-ssr-client-manifest.json'));

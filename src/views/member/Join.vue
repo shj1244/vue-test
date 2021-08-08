@@ -28,7 +28,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions('user',['duplicateCheck']),
+        ...mapActions('user',['duplicateCheck', 'createMember']),
         async checkId(id) {
             const data = await this.duplicateCheck({field: 'mb_id', value:id});
             return data
@@ -44,6 +44,10 @@ export default {
                 this.isLoading = false;
             }, 1000)
             console.log("save", form);
+
+            const data = await this.createMember(form);
+
+            this.isLoading = false;
         }
     }  
 };

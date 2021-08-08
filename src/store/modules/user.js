@@ -21,6 +21,9 @@ export const actions = {
         return data;
     },
     async createMember(ctx, form){
-        console.log('user', form);
+        const { $axios } = Vue.prototype;
+        const data = await $axios.post(`/api/member`,form);
+        //console.log('data',data );
+        return data;
     }
 }
