@@ -82,7 +82,22 @@ const rules = {
         label : "날짜",
         info : 'YYYY-MM-DD 형식에 맞게 입력하세요.',
         required :true,
-        pattern : /^\d(4)-\d(2)-\d(2)$/
+        pattern : /^\d{4}-\d{2}-\d{2}$/
+        };
+        const opt = Object.assign(defaultOptions, options);
+        const ruleArr = [];
+        if(opt.required){
+            ruleArr.push(rules.require(opt))
+        }
+        ruleArr.push(rules.pattern(opt));
+        return ruleArr;
+    },
+    phone(options) {
+        const defaultOptions = {
+        label : "전화번호",
+        info : null,
+        required :true,
+        pattern : /^(\d{2,3}-)?\d{3,4}-\d{4}$/
         };
         const opt = Object.assign(defaultOptions, options);
         const ruleArr = [];
