@@ -25,7 +25,7 @@
 
 <script>
 import SiteFooter from './components/layout/SiteFooter.vue';
-import SiteTitle from './components/layout/SiteTitle2.vue';
+import SiteTitle from './components/layout/SiteTitle.vue';
 import SiteNavi from './components/layout/SiteNavi.vue';
 import SiteUser from './components/layout/SiteUser.vue';
 

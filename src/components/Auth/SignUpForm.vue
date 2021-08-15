@@ -40,25 +40,25 @@
       :cbCheck="cbCheckEmail"
     />
 
-    <input-date 
-      v-model="form.mb_birth" 
-      label="생년월일" 
+    <input-date
+      v-model="form.mb_birth"
+      label="생년월일"
       prepend-icon="mdi-calendar"
-      :rules="rules.date({label:'생년월일'})"
+      :rules="rules.date({ label: '생년월일' })"
     />
 
-    <input-radio 
-      v-model="form.mb_gender" 
-      :items="genderItems" 
-      row 
+    <input-radio
+      v-model="form.mb_gender"
+      :items="genderItems"
+      row
       prepend-icon="mdi-gender-male-female"
-      :rules="[rules.require({label: '성별' })]"
+      :rules="[rules.require({ label: '성별' })]"
     />
 
-    <input-phone 
-      v-model="form.mb_phone" 
-      label="전화번호" 
-      prepend-icon="mdi-phone" 
+    <input-phone
+      v-model="form.mb_phone"
+      label="전화번호"
+      prepend-icon="mdi-phone"
       :rules="rules.phone()"
     />
 
@@ -75,71 +75,78 @@
 </template>
 
 <script>
-import InputDuplicateCheck from '../InputForms/InputDuplicateCheck.vue';
+import InputDuplicateCheck from "../InputForms/InputDuplicateCheck.vue";
 import validateRules from "../../../util/validateRules";
-import InputPassword from '../InputForms/inputPassword.vue';
-import InputDate from '../InputForms/inputDate.vue';
-import InputRadio from '../InputForms/inputRadio.vue';
-import InputPhone from '../InputForms/inputPhone.vue';
-import InputPost from '../InputForms/inputPost.vue';
+import InputPassword from "../InputForms/inputPassword.vue";
+import InputDate from "../InputForms/inputDate.vue";
+import InputRadio from "../InputForms/inputRadio.vue";
+import InputPhone from "../InputForms/inputPhone.vue";
+import InputPost from "../InputForms/inputPost.vue";
 
 export default {
-  components: { InputDuplicateCheck, InputPassword, InputDate, InputRadio, InputPhone, InputPost },
-    name : "SignUpForm",
-    props : {
-      isLoading : {
-        type : Boolean,
-        required : true,
+  components: {
+    InputDuplicateCheck,
+    InputPassword,
+    InputDate,
+    InputRadio,
+    InputPhone,
+    InputPost,
+  },
+  name: "SignUpForm",
+  props: {
+    isLoading: {
+      type: Boolean,
+      required: true,
+    },
+    cbCheckId: {
+      type: Function,
+      default: null,
+    },
+    cbCheckEmail: {
+      type: Function,
+      default: null,
+    },
+  },
+  data() {
+    return {
+      valid: true,
+      form: {
+        mb_id: "test",
+        mb_password: "abcd1234",
+        mb_name: "테스트",
+        mb_birth: "2020-08-03",
+        mb_gender: "M",
+        mb_email: "test@test.com",
+        mb_phone: "010-1111-1111",
+        mb_zip: "04538",
+        mb_addr1:
+          "서울 중구 삼일대로 343 (저동1가, 대신파이낸스센터(Daishin Finance Center))",
+        mb_addr2: "21층 it개발부",
       },
-      cbCheckId :{
-        type :Function,
-        default : null,
-      },
-      cbCheckEmail :{
-        type :Function,
-        default : null,
-      },
+      genderItems: [
+        { label: "남자", value: "M" },
+        { label: "여자", value: "F" },
+      ],
+      confirmPw: "abcd1234",
+    };
+  },
+  computed: {
+    rules: () => validateRules,
+  },
+  methods: {
+    async save() {
+      this.$refs.form.validate();
+      await this.$nextTick();
+      if (!this.valid) return;
+      if (!this.$refs.id.validate()) return;
+      if (!this.$refs.email.validate()) return;
+      this.loading = true;
+      this.$emit("onSave", this.form);
+      console.log(this.form);
     },
-    data(){
-        return{   
-            valid :true,     
-            form :{
-                mb_id : "test",
-                mb_password : "abcd1234",
-                mb_name : "테스트",
-                mb_birth : "2020-08-03",
-                mb_gender : "M",
-                mb_email : "test@test.com",
-                mb_phone : "010-1111-1111",
-                mb_zip : "04538",
-                mb_addr1 : "서울 중구 삼일대로 343 (저동1가, 대신파이낸스센터(Daishin Finance Center))",
-                mb_addr2 : "21층 it개발부",
-            },
-            genderItems : [
-              {label : "남자" , value : "M"},
-              {label : "여자" , value : "F"},
-            ],
-            confirmPw : "abcd1234",
-        }
-    },
-    computed : {
-      rules: () => validateRules,
-    },
-    methods : {
-      async save(){
-          this.$refs.form.validate();
-          await this.$nextTick();
-          if(!this.valid) return;
-          if(!this.$refs.id.validate()) return;
-          if(!this.$refs.email.validate()) return;
-          this.loading = true;
-          this.$emit("onSave", this.form);
-          console.log(this.form);
-      }
-    },
-}
+  },
+};
 </script>
 
 <style>
-
 </style>

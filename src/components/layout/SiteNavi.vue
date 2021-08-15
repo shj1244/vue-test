@@ -19,7 +19,7 @@
 import { mapState } from 'vuex'
 import NestedMenu from './NestedMenu.vue'
 import { deepCopy } from "../../../util/lib"
-import SiteTitle from "../layout/SiteTitle2.vue"
+import SiteTitle from "./SiteTitle.vue"
 export default {
     components : { NestedMenu ,SiteTitle},
     name : "SiteNavi",
