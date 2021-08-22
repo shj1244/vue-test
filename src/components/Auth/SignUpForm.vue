@@ -46,6 +46,14 @@
       prepend-icon="mdi-calendar"
       :rules="rules.date({ label: '생년월일' })"
     />
+    <!-- accept="image/jpg" 허용할 이미지 확장자-->
+    <v-file-input 
+      label="회원이미지" 
+      v-model="form.mb_image" 
+      prepend-icon="mdi-account-box" 
+      accept="image/jpg,image/png,image/jpeg,image/bmp"
+    />
+
 
     <input-radio
       v-model="form.mb_gender"
@@ -111,17 +119,18 @@ export default {
     return {
       valid: true,
       form: {
-        mb_id: "test",
+        mb_id: "testx",
         mb_password: "abcd1234",
         mb_name: "테스트",
         mb_birth: "2020-08-03",
         mb_gender: "M",
-        mb_email: "test@test.com",
+        mb_email: "testa@test.com",
         mb_phone: "010-1111-1111",
         mb_zip: "04538",
         mb_addr1:
           "서울 중구 삼일대로 343 (저동1가, 대신파이낸스센터(Daishin Finance Center))",
         mb_addr2: "21층 it개발부",
+        mb_image : null, //폼의 이미지는 객체가 아닌 폼객체를 따로 만들어서 이미지를 첨부해서 보낸다.
       },
       genderItems: [
         { label: "남자", value: "M" },
@@ -140,9 +149,18 @@ export default {
       if (!this.valid) return;
       if (!this.$refs.id.validate()) return;
       if (!this.$refs.email.validate()) return;
-      this.loading = true;
-      this.$emit("onSave", this.form);
-      console.log(this.form);
+      //this.loading = true;
+      //console.log("1111111111111111====>"+this.mb_image);
+      //this.$emit("onSave", this.form);
+      //console.log(this.form);
+      const formData = new FormData();
+      const keys = Object.keys(this.form);
+      for(const key of keys){
+        formData.append(key, this.form[key]);
+      }
+      //formData.append('mb_image', this.mb_image);
+      this.$emit("onSave", formData);
+      console.log("formData===========>"+formData);
     },
   },
 };

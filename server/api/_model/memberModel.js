@@ -56,6 +56,8 @@ const memberModel = {
     },
     async createMember(req) {
         //console.log("createMember", req.body);
+        //console.log("Image", req.files);
+        
 
         //날짜 및 현재시간으로 나옴.
         const at = moment().format('LT');
@@ -72,6 +74,20 @@ const memberModel = {
             mb_update_at: at,
             mb_update_ip: ip,
         };
+       
+        //DB에 인서트 하기 전에 이미지는 null로 설정
+        delete payload.mb_image;
+        //이미지 업로드 처리
+        if(req.files && req.files.mb_image){
+            console.log(MEMBER_PHOTO_PATH);
+            req.files.mb_image.mv(`${MEMBER_PHOTO_PATH}/${payload.mb_id}.jpg`,(err)=>{
+                //console.log("img upload err",err)
+                if(err) {
+                    console.log("Member image upload err",err)
+                }
+            });
+        }
+        //console.log('payload===>',payload);
 
         payload.mb_password = jwt.generatePassword(payload.mb_password);
         const sql = sqlHelper.Insert(TABLE.MEMBER, payload);

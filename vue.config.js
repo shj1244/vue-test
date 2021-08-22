@@ -55,7 +55,10 @@ module.exports = {
 		proxy: {
 			'/api' : {//proxy 포트 설정
  				target : `http://localhost:${process.env.VUE_APP_SERVER_PORT}` //개발서버dev 
-			}
+			},
+			'/upload' : {
+				target : `http://localhost:${process.env.VUE_APP_SERVER_PORT}` //개발서버dev 
+		   },
 		}
 	},
 	//여기서 개발서버 나눔

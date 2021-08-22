@@ -3,6 +3,7 @@ const passport = require('passport');
 const { modelCall } = require('../../util/lib');
 const memberModel = require('./_model/memberModel');
 const jwt = require('../plugins/jwt');
+const fs = require('fs');
 
 router.get('/duplicateCheck/:field/:value', async (req, res) => {
     const result = await modelCall(memberModel.duplicateCheck, req.params);
@@ -30,9 +31,12 @@ router.post('/loginLocal', async (req, res) => {
                 } else {
                     const token = jwt.getToken(member);
                     const data = memberModel.loginMember(req);
-                    //console.log("login data", data);
                     member.mb_login_at = data.mb_login_at;
                     member.mb_login_ip = data.mb_login_ip;
+                    // 이미지가 있는지 확인
+                    if(fs.existsSync(`${MEMBER_PHOTO_PATH}/${member.mb_id}.jpg`)){
+                        member.mb_image = true;
+                    }
                     res.json({ member, token });
                 }
             })
