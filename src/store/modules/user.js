@@ -1,5 +1,5 @@
 import Vue from "vue";
-
+import VueCookies from "vue-cookies";
 export const state = () => ({ //상태관리
     member: null,
 });
@@ -15,6 +15,14 @@ export const getters = {
 };
 
 export const actions = {
+    async initUser({commit}) {
+        //console.log('actions',{field, value} );
+        const { $axios } = Vue.prototype;
+        const member = await $axios.get('/api/member/auth');
+        if(member){
+            commit('SET_MEMBER', member);
+        }
+    },
     async duplicateCheck(ctx, { field, value }) {
         //console.log('actions',{field, value} );
         const { $axios } = Vue.prototype;
@@ -33,6 +41,7 @@ export const actions = {
         const data = await $axios.post(`/api/member/loginLocal`, form);
         if(data && data.member) {
             commit('SET_MEMBER', data.member);
+            VueCookies.set('token', data.token);
         }
         return data;
     }

@@ -9,6 +9,14 @@ const app = express();
 const port = process.env.VUE_APP_SERVER_PORT || 3000;
 const webServer = http.createServer(app);
 
+let isDisableKeepAlive = false;
+app.use((req, res, next)=>{
+	if(isDisableKeepAlive){
+		console.log('Kee Alive', isDisableKeepAlive);
+		res.set('Connection', 'close');
+	}
+	next();
+})
 //const jwt = require('./plugins/jwt');
 //console.log(jwt.getRandToken(32)) --얻은값으로 .env에 SECRET_KEY=55IAYrdPTbFknbVfbartG2YdFkvByQEt
 //console.log(jwt.generatePassword('abcd1234'))
@@ -63,14 +71,15 @@ const template = fs.readFileSync(path.join(__dirname, 'index.template.html'), 'u
 const serverBundle = require(path.join(__dirname, '../dist/vue-ssr-server-bundle.json'));
 const clientManifest = require(path.join(__dirname, '../dist/vue-ssr-client-manifest.json'));
 
-const renderer = createBundleRenderer(serverBundle, {
-	runInNewContext: false,
-	template,
-	clientManifest,
-});
+
 
 app.get('*', (req, res) => {
-	console.log('server.js router *');
+	const renderer = createBundleRenderer(serverBundle, {
+		runInNewContext: false,
+		template,
+		clientManifest,
+	});
+	console.log('process.memoryUsage()=====>',process.memoryUsage());
 
 	const ctx = {
 		url: req.url,
@@ -79,13 +88,29 @@ app.get('*', (req, res) => {
 	};
 
 	const stream = renderer.renderToStream(ctx);
-
 	stream.on('end', () => {
-		console.log('스트림 렌더 종료');
+		const memSize = Object.entries(process.memoryUsage())[0][1];
+		console.log("스트림 렌더 종료 MemSize", (memSize / 1024 / 1024).toFixed(4));
+			
+		if(process.platform == 'linux'){
+			if(memSize > 150000000) {
+				process.emit('SIGINT');
+			}
+		}
 	}).pipe(res);
 });
 
 // 서버 응답
 webServer.listen(port, () => {
+	process.send('ready');
 	console.log(`http://localhost:${port}`)
 });
+
+
+process.on('SIGINT', function(){
+	isDisableKeepAlive= true;
+	webServer.close(function(){
+		console.log('server Closed');
+		process.exit(0);
+	})
+})

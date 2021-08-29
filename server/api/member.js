@@ -34,13 +34,17 @@ router.post('/loginLocal', async (req, res) => {
                     member.mb_login_at = data.mb_login_at;
                     member.mb_login_ip = data.mb_login_ip;
                     // 이미지가 있는지 확인
-                    if(fs.existsSync(`${MEMBER_PHOTO_PATH}/${member.mb_id}.jpg`)){
-                        member.mb_image = true;
-                    }
+                    //if(fs.existsSync(`${MEMBER_PHOTO_PATH}/${member.mb_id}.jpg`)){
+                    //    member.mb_image = true;
+                    //}
                     res.json({ member, token });
                 }
             })
         }
     })(req, res);
+})
+router.get('/auth', (req, res) => {
+    console.log('auth',req.user);
+    res.json(req.user || false);
 })
 module.exports = router;
