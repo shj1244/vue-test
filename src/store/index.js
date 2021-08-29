@@ -6,6 +6,7 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
 	state: {
+		appReady : false,
 		config: {
 			title : "ezCode Home",
 			footer: "ezCode all right reserved.",

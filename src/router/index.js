@@ -13,7 +13,7 @@ export function createRouter() {
 	});
 
   router.beforeEach(async(to, from, next)=>{
-    //console.log('router.js beforeEach');
+    // console.log('router.js beforeEach');
     const {$Progress, $toast} = Vue.prototype;
     
     if($Progress) $Progress.start();
@@ -23,6 +23,7 @@ export function createRouter() {
         if(window.__INITIAL_STATE__){
         	store.replaceState(window.__INITIAL_STATE__);
         }else{
+         
           await store.dispatch('appInit');
         }
       }

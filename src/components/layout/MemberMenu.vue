@@ -4,19 +4,33 @@
         <v-btn color="primary" block>회원정보수정</v-btn>
     </v-card-actions>
     <v-card-actions>
-        <v-btn color="secondary" block>로그아웃</v-btn>
+        <v-btn color="secondary" @click="logout" block>로그아웃</v-btn>
     </v-card-actions>
   </div>
 </template>
 
 <script>
-import { mapState } from "vuex"; 
+import { mapActions, mapState } from "vuex"; 
 export default {
     name: "MemberMenu",
     computed: {
         ...mapState({
             member: (state) => state.user.member
-        })
+        }),
+    },
+    methods: {
+        ...mapActions('user', ['signOut']),
+        async logout(){
+            const mb_name = await this.signOut();
+            if(mb_name){
+                //console.log("this.$router.name..",this.$router)
+                this.$toast.info(`${mb_name}님 로그아웃 하셨습니다.`);
+                if(this.$route.name !='Home'){
+                    this.$route.push('/');
+                }
+                
+            }
+        }
     }
 }
 </script>

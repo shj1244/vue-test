@@ -44,9 +44,13 @@ export default {
   methods: {
     ...mapActions("user", ["signInLocal"]),
     async loginLocal(form) {
-      console.log("loginLocal form", form);
+      //console.log("loginLocal form", form);
       const data = await this.signInLocal(form);
-      console.log("loginLocal data", data);
+      //console.log("loginLocal data", data);
+      if(data){
+        this.$router.push('/');
+        this.$toast.info(`${this.$store.state.user.member.mb_name}님 환영합니다.`);
+      }
     },
   },
 };
