@@ -26,7 +26,7 @@ export default {
                 //console.log("this.$router.name..",this.$router)
                 this.$toast.info(`${mb_name}님 로그아웃 하셨습니다.`);
                 if(this.$route.name !='Home'){
-                    this.$route.push('/');
+                    this.$router.push('/');
                 }
                 
             }
