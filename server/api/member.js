@@ -33,6 +33,7 @@ router.post('/loginLocal', async (req, res) => {
                     const data = memberModel.loginMember(req);
                     member.mb_login_at = data.mb_login_at;
                     member.mb_login_ip = data.mb_login_ip;
+                    res.cookie('token', token, {httpOnly :true});
                     // 이미지가 있는지 확인
                     //if(fs.existsSync(`${MEMBER_PHOTO_PATH}/${member.mb_id}.jpg`)){
                     //    member.mb_image = true;
@@ -43,8 +44,34 @@ router.post('/loginLocal', async (req, res) => {
         }
     })(req, res);
 })
+
+// 인증
 router.get('/auth', (req, res) => {
-    console.log('auth',req.user);
-    res.json(req.user || false);
+    //console.log('auth',req.user);
+    //res.json(req.user || false);
+    const member = req.user || null;
+    const token  = req.cookies.token || null;
+    res.json({member,token});
 })
+
+// 로그아웃
+router.get('/signOut', (req,res)=>{
+    res.clearCookie('token');
+    res.json(true);
+})
+
+// 아이디 찾기
+router.get('/findId', async(req,res)=>{
+    //console.log('query===>',req.query);
+    const result = await modelCall(memberModel.findId, req.query);
+    res.json(result);
+});
+
+// 비밀번호 찾기
+router.get('/findPw', async(req,res)=>{
+    //console.log('query===>',req.query);
+    const result = await modelCall(memberModel.findPw, req);
+    res.json(result);
+});
+
 module.exports = router;

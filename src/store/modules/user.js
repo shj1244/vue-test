@@ -1,5 +1,5 @@
 import Vue from "vue";
-import VueCookies from "vue-cookies";
+import qs from "qs";
 export const state = () => ({ //상태관리
     member: null,
 });
@@ -7,6 +7,9 @@ export const state = () => ({ //상태관리
 export const mutations = {
     SET_MEMBER(state, member) {
         state.member = member;
+    },
+    SET_TOKEN(state, token){
+        state.token = token;
     }
 };
 
@@ -16,11 +19,11 @@ export const getters = {
 
 export const actions = {
     async initUser({commit}) {
-        //console.log('actions',{field, value} );
         const { $axios } = Vue.prototype;
-        const member = await $axios.get('/api/member/auth');
-        if(member){
-            commit('SET_MEMBER', member);
+        const data = await $axios.get('/api/member/auth');
+        if(data && data.member && data.token){
+            commit('SET_MEMBER', data.member);
+            commit('SET_TOKEN', data.token);
         }
     },
     async duplicateCheck(ctx, { field, value }) {
@@ -41,15 +44,30 @@ export const actions = {
         const data = await $axios.post(`/api/member/loginLocal`, form);
         if(data && data.member) {
             commit('SET_MEMBER', data.member);
-            VueCookies.set('token', data.token);
+            commit('SET_TOKEN', data.token);
+            //VueCookies.set('token', data.token);
         }
         return !!data;
     },
     async signOut({commit, state}){
         const mb_name = state.member.mb_name;
-        console.log('mb_name',mb_name)
-        commit('SET_MEMBER', null)
-        VueCookies.remove('token');
+        const {$axios} = Vue.prototype;
+        await $axios.get('/api/member/signOut');
+        commit('SET_MEMBER', null);
+        commit('SET_TOKEN', null);
+        //VueCookies.remove('token');
         return mb_name;
+    },
+    async findIdLocal(ctx,form){
+        const {$axios} = Vue.prototype;
+        const query = qs.stringify(form);
+        const data = await $axios.get(`/api/member/findId?${query}`);
+        return data;
+    },
+    async findPwLocal(ctx,form){
+        const {$axios} = Vue.prototype;
+        const query = qs.stringify(form);
+        const data = await $axios.get(`/api/member/findPw?${query}`);
+        return data;
     }
 }
