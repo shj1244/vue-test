@@ -153,7 +153,7 @@ const memberModel = {
         const baseUrl = `${req.protocol}://${hostName}/modifyPassword/`;
 
         // {{name }} {{link}} {{time}}
-        let sm_content = fs.readFileSync(__dirname + '/findPwForm.Html').toString();
+        let sm_content = fs.readFileSync(__dirname + '/findPwForm.html').toString();
         sm_content = sm_content.replace('{{name}}', member.mb_name);
         sm_content = sm_content.replace('{{time}}', expire_at.format('LLLL') + '분');
         sm_content = sm_content.replace('{{link}}', baseUrl + sm_hash);
