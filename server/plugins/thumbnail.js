@@ -21,7 +21,7 @@ const thumnail = function(uploadPath){
 
         // 이미지에 대한 실 사이즈
         const dim = imageSize(srcFile);
-        console.log('dim', dim);
+        //console.log('dim', dim);
 
         // 이미지파일 구분 일때 - 드모르간 법칙 사용이 연산이 빠르다
         if(dim.type != "jpg" && dim.type != "jpeg" && dim.type != "png" && dim.type != "bmp"){

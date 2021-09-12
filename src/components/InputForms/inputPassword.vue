@@ -31,7 +31,7 @@ export default {
     methods: {
         onInput(val) {
             this.$emit('input', val);
-            console.log("패스워드====>",val)
+            //console.log("패스워드====>",val)
         }
 
     }

@@ -48,7 +48,7 @@ const cilentConfig = {
 	],
 };
 
-console.log(process.env);
+//console.log(process.env);
 module.exports = {
 
 	devServer : {

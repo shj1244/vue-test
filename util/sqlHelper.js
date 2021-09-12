@@ -53,7 +53,25 @@ const sqlHelper = {
         }
         query = query.replace('{2}', wheres.join(' AND '));
         return { query, values };
-    }
+    },
+    DeleteSimple(table, data) {
+        let query = `DELETE FROM ${table}`;
+        const where = [];
+        const values = [];
+
+        if (data) {
+            const keys = Object.keys(data);
+            for (const key of keys) {
+                where.push(`${key}=?`)
+                values.push(data[key]);
+            }
+            query += ` WHERE ` + where.join(' AND ');
+        } else {
+            throw new Error('삭제할 Where(hash 데이터)가 없습니다.')
+        }
+
+        return { query, values };
+    },
 }
 
 module.exports = sqlHelper;

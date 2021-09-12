@@ -12,7 +12,7 @@ const webServer = http.createServer(app);
 let isDisableKeepAlive = false;
 app.use((req, res, next)=>{
 	if(isDisableKeepAlive){
-		console.log('Kee Alive', isDisableKeepAlive);
+		//console.log('Kee Alive', isDisableKeepAlive);
 		res.set('Connection', 'close');
 	}
 	next();

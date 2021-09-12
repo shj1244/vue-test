@@ -100,7 +100,7 @@ export default {
                 fullAddress += (extraAddress !== '' ? ` (${extraAddress})` : '')
             }
             
-            console.log(data.zonecode, fullAddress) // e.g. '서울 성동구 왕십리로2길 20 (성수동1가)'
+            //console.log(data.zonecode, fullAddress) // e.g. '서울 성동구 왕십리로2길 20 (성수동1가)'
             this.$emit('update:zipcode', data.zonecode);
             this.$emit('update:addr1', fullAddress);
             this.closeDialog();            

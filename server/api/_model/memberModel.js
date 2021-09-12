@@ -83,7 +83,7 @@ const memberModel = {
         delete payload.mb_image;
         //이미지 업로드 처리
         if(req.files && req.files.mb_image){
-            console.log(MEMBER_PHOTO_PATH);
+            //console.log(MEMBER_PHOTO_PATH);
             req.files.mb_image.mv(`${MEMBER_PHOTO_PATH}/${payload.mb_id}.jpg`,(err)=>{
                 //console.log("img upload err",err)
                 if(err) {
@@ -133,9 +133,9 @@ const memberModel = {
     },
     async findPw(req){
         const data = req.query;
-        console.log(data)
+        //console.log(data)
         const sql = sqlHelper.SelectSimple(TABLE.MEMBER, data, ['mb_name']);
-        console.log("query===>",sql);
+        //console.log("query===>",sql);
         const [[member]] = await db.execute(sql.query, sql.values);
         if(!member) throw new Error('일치하는 회원정보가 없습니다.');
 
@@ -177,6 +177,83 @@ const memberModel = {
             return {err : `email 발송에 실패 하였습니다.\n관리자에게 문의주세요.`};
         }
 
+        return member;
+    },
+    async modifyPassword(data){
+        // 유효시간이 경과한 데이터 삭제
+        const delQuery = `DELETE FROM ${TABLE.SEND_MAIL} WHERE sm_type=1 AND sm_expire_at < NOW()`;
+        await db.execute(delQuery);
+
+        // 유효시간 안에 있는 해쉬로 검색
+        const sql = {
+            query : `SELECT sm_to FROM ${TABLE.SEND_MAIL} WHERE sm_type=? AND sm_hash=? AND sm_expire_at > NOW()`,
+            values : [1, data.hash]
+        };
+        const [[row]] = await db.execute(sql.query, sql.values);
+
+        if(!row){
+            throw new Error('시간이 만료되었거나 이미 처리되었습니다.');
+        }
+        const mb_email = row.sm_to;
+        const mb_password = await jwt.generatePassword(data.password);
+        const upSql = sqlHelper.Update(TABLE.MEMBER, {mb_password}, {mb_email});
+        const [upRes] = await db.execute(upSql.query, upSql.values);
+        //console.log(upRes);
+
+        // 처리결과 삭제
+        const delSql = sqlHelper.DeleteSimple(TABLE.SEND_MAIL, {sm_hash : data.hash});
+        db.execute(delSql.query, delSql.values);
+        return upRes.affectedRows == 1;
+    },
+    async googleCallback(req, res, err, member){
+        let html = fs.readFileSync(__dirname + '/socialPopup.html').toString();
+        let payload = {};
+        if(err){
+            payload.err= err;
+        } else {
+            // 토큰 만들고 쿠키 생성
+            const token = jwt.getToken(member);
+            req.body.mb_id= member.mb_id;
+
+            const data = memberModel.loginMember(req);
+            member.mb_login_at = data.mb_login_at;
+            member.mb_login_ip = data.mb_login_ip;
+            res.cookie('token', token, {httpOnly :true});
+            
+            payload.token = token;
+            payload.member = member;
+        }
+        html = html.replace('{{payload}}', JSON.stringify(payload));
+
+        return html;
+    },
+    async loginGoole(req, profile){
+        let member = null;
+        try{ // 이미 회원이 있는지 확인
+            member = await memberModel.getMemberBy({
+                mb_email: profile.email 
+            });
+            
+        } catch(e) { // 회원정보가 없으면 새로 db에 저장
+            const at = moment().format('LT');
+            const ip = getIp(req);
+            const data = {
+                mb_id : profile.id,
+                mb_password : '',
+                mb_name : profile.displayName,
+                mb_email : profile.email,
+                mb_level : await getDefaultMemberLevel(),
+                mb_create_at: at,
+                mb_create_ip: ip,
+                mb_update_at: at,
+                mb_update_ip: ip,
+            };
+            const sql = sqlHelper.Insert(TABLE.MEMBER, data);
+            await db.execute(sql.query, sql.values);
+            member = await memberModel.getMemberBy({
+                mb_email: profile.email 
+            });
+        }
         return member;
     }
 }

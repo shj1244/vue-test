@@ -9,7 +9,7 @@ import VueCookies from "vue-cookies";
 // axios.defaults.headers.common['Authorization'] = AUTH_TOKEN;
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
-console.log(process.env);
+//console.log(process.env);
 
 let config = {
   baseURL: process.env.BASE_URL || process.env.apiUrl || "",

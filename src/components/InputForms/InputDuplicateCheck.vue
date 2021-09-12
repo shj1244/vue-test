@@ -78,7 +78,7 @@ export default {
             this.successMsg = "";
             //console.log("input===============================>")  
             const data = await this.cbCheck(this.value);
-            console.log("data.cnt===>",data)  
+            //console.log("data.cnt===>",data)  
             if(data && data.cnt == 0) {
                 this.successMsg = `사용가능한 ${this.$attrs.label} 입니다.`;
                 this.isCheck = true;

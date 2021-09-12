@@ -74,4 +74,23 @@ router.get('/findPw', async(req,res)=>{
     res.json(result);
 });
 
+router.patch('/modifyPassword', async(req, res)=>{
+    const result = await modelCall(memberModel.modifyPassword, req.body)
+    res.json(result)
+})
+
+// 구글 로그인 요청
+router.get('/loginGoogle', passport.authenticate("google", {scope: ["email", "profile"]}));
+
+// 구글 로그인 콜백
+router.get('/google-callback', (req, res)=>{
+    passport.authenticate('google', async function (err, member) { //local은 passport.js의 LocalStrategy 호출
+        console.log('member===>',member);
+        console.log('err===>',err);
+        const result = await modelCall(memberModel.googleCallback, req, res, err, member)
+        res.end(result);
+    })(req, res);
+
+})
+
 module.exports = router;

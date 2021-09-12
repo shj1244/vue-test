@@ -35,7 +35,7 @@ export default {
       valid: true,
       form: {
         mb_id: "test22",
-        mb_password: "abcd1234",
+        mb_password: "shj1244",
       },
     };
   },
@@ -48,7 +48,7 @@ export default {
       await this.$nextTick();
       if (!this.valid) return;
       this.$emit("save", this.form);
-      console.log(this.form);
+      //console.log(this.form);
     },
   },
 };

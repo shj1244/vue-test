@@ -69,5 +69,11 @@ export const actions = {
         const query = qs.stringify(form);
         const data = await $axios.get(`/api/member/findPw?${query}`);
         return data;
+    },
+    async modifyPassword(ctx, form){
+        const {$axios} = Vue.prototype;
+        const data = await $axios.patch(`/api/member/modifyPassword`, form);
+        return data;
     }
+    
 }

@@ -17,12 +17,17 @@ const routes = [
     {
       path: '/login',
       name: 'NoAuthLogin',
-      component: () => import(/* webpackChunkName: "error" */ '../views/member/Login.vue')
+      component: () => import(/* webpackChunkName: "login" */ '../views/member/Login.vue')
     },
     {
       path: '/join',
       name: 'NoAuthJoin',
-      component: () => import(/* webpackChunkName: "error" */ '../views/member/Join.vue')
+      component: () => import(/* webpackChunkName: "join" */ '../views/member/Join.vue')
+    },
+    {
+      path: '/modifyPassword/:hash',
+      name: 'NoAuthModifyPassword',
+      component: () => import(/* webpackChunkName: "modifyPassword" */ '../views/member/modifyPassword.vue')
     },
     {
       path: '*',
