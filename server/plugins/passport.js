@@ -3,11 +3,10 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const jwt = require('../plugins/jwt');
 const memberModel = require('../api/_model/memberModel');
-const GoogleStrategy = require( 'passport-google-oauth2' ).Strategy;
+const GoogleStrategy = require( 'passport-google-oauth2').Strategy;
 
 const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, DEV_ENV, VUE_APP_SERVER_PORT, DB_HOST } = process.env;
-
-const CALLBACK_URL = DEV_ENV == 'DEV' ? `http://localhost:${VUE_APP_SERVER_PORT}` : `https://${DB_HOST}`
+const CALLBACK_URL = DEV_ENV=='DEV' ? `http://localhost:${VUE_APP_SERVER_PORT}` : `https://${DB_HOST}`; 
 console.log("CALLBACK_URL====>", DEV_ENV, CALLBACK_URL)
 
 module.exports = (app) => {
@@ -30,19 +29,6 @@ module.exports = (app) => {
         }
     ));
     
-    app.use(async(req,res,next)=>{
-        const token = req.cookies.token;
-        if(!token) return next();
-        const {mb_id} = jwt.verify(token);
-        if(!mb_id) return next();
-        try{
-            const member = await memberModel.getMemberBy({mb_id});
-            req.login(member, {session:false}, (err)=>{});
-        }catch(e){
-            console.log('auth error', e)
-        }
-        next();
-    });
     passport.use(new GoogleStrategy({
         clientID:     GOOGLE_CLIENT_ID,
         clientSecret: GOOGLE_CLIENT_SECRET,

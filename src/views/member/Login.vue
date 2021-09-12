@@ -48,6 +48,7 @@ export default {
       tabs: parseInt(this.$route.query.tab) || 0,
       items: ["로그인", "아이디 찾기", "비밀번호 찾기"],
       isLoading: false,
+      dialog: false,
     };
   },
   methods: {
@@ -61,7 +62,9 @@ export default {
       //console.log("loginLocal data", data);
       if(data){
         this.$router.push('/');
-        this.$toast.info(`${this.$store.state.user.member.mb_name}님 환영합니다.`);
+        this.$toast.info(
+          `${this.$store.state.user.member.mb_name}님 환영합니다.`
+        );
       }
     },
     async findId(form){
@@ -70,7 +73,10 @@ export default {
       this.isLoading = false;
       //console.log("loginLocal data", data);
       if(data && data.mb_id){
-        await this.$ezNotify.alert(`<span style="font-size:1.5em">회원아이디 : [ <b>${data.mb_id}</b> ] 입니다.</span>`, "아이디 찾기 결과");
+        await this.$ezNotify.alert(
+          `<span style="font-size:1.5em">회원아이디 : [ <b>${data.mb_id}</b> ] 입니다.</span>`, 
+          "아이디 찾기 결과"
+        );
         // 로그인 페이지로 이동
         this.tabs = 0;
       }
@@ -80,7 +86,10 @@ export default {
       const data = await this.findPwLocal(form);
       this.isLoading = false;
       if(data && data.mb_name){
-        this.$toast.info(`${data.mb_name}님 ${form.mb_email}로 이메일을 발송하였습니다.`);
+        await this.$ezNotify.alert(
+          `${data.mb_name}님<br><b>${form.mb_email}</b>로 이메일을 발송하였습니다.`,
+          "이메일 발송 성공"
+        );
         this.tabs = 0;
       }
     },
@@ -88,7 +97,7 @@ export default {
       const childWindow = window.open(
         "/api/member/loginGoogle",
         "googleAuth",
-        "top=10, left=10, width=500, status=no, menubar=no, toolbar=no, resizable=no"
+        "top=10, left=10, width=500, height=600, status=no, menubar=no, toolbar=no, resizable=no"
       );
       //window.addEventListener('message', this.googleLoginCallback, false);
       if(!window.onGoogleCallback){
@@ -104,8 +113,6 @@ export default {
         this.SET_TOKEN(payload.token);
         // 최초 로그인 경우 정보를 변경하는 페이지로 이동
 
-
-        this.isLoading = true;
         this.$router.push('/');
         this.$toast.info(
           `${this.$store.state.user.member.mb_name}님 환영합니다.`

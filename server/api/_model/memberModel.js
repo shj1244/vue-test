@@ -61,11 +61,9 @@ const memberModel = {
     async createMember(req) {
         //console.log("createMember", req.body);
         //console.log("Image", req.files);
-        
 
         //날짜 및 현재시간으로 나옴.
         const at = moment().format('LT');
-
         const ip = getIp(req);
         //console.log('IP',ip);
 
@@ -97,7 +95,7 @@ const memberModel = {
         const sql = sqlHelper.Insert(TABLE.MEMBER, payload);
         const [row] = await db.execute(sql.query, sql.values);
         //console.log(row.affecttedRows);
-        console.log('가입', row)
+        //console.log('가입', row)
         return row.affectedRows == 1;
     },
     async getMemberBy(form, cols = []) {
@@ -182,12 +180,12 @@ const memberModel = {
     async modifyPassword(data){
         // 유효시간이 경과한 데이터 삭제
         const delQuery = `DELETE FROM ${TABLE.SEND_MAIL} WHERE sm_type=1 AND sm_expire_at < NOW()`;
-        await db.execute(delQuery);
+		await db.execute(delQuery);
 
         // 유효시간 안에 있는 해쉬로 검색
         const sql = {
-            query : `SELECT sm_to FROM ${TABLE.SEND_MAIL} WHERE sm_type=? AND sm_hash=? AND sm_expire_at > NOW()`,
-            values : [1, data.hash]
+            query: `SELECT sm_to FROM ${TABLE.SEND_MAIL} WHERE sm_type=? AND sm_hash=? AND sm_expire_at > NOW()`,
+			values: [1, data.hash]
         };
         const [[row]] = await db.execute(sql.query, sql.values);
 
@@ -207,6 +205,7 @@ const memberModel = {
     },
     async googleCallback(req, res, err, member){
         let html = fs.readFileSync(__dirname + '/socialPopup.html').toString();
+        console.log('1111111member===>',member);
         let payload = {};
         if(err){
             payload.err= err;
