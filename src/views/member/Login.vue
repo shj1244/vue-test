@@ -96,9 +96,9 @@ export default {
       }
     },
     googleLoginCallback(payload){
-      console.log(payload);
+      console.log("googleLoginCallback payload===>",payload);
       if(payload.err){
-        this.$toast.err(payload.err);
+        this.$toast.error(payload.err);
       } else {
         this.SET_MEMBER(payload.member);
         this.SET_TOKEN(payload.token);
