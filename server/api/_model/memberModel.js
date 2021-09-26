@@ -203,9 +203,9 @@ const memberModel = {
         db.execute(delSql.query, delSql.values);
         return upRes.affectedRows == 1;
     },
-    async googleCallback(req, res, err, member){
+    async socialCallback(req, res, err, member){
         let html = fs.readFileSync(__dirname + '/socialPopup.html').toString();
-        console.log('1111111member===>',member);
+        //console.log('1111111member===>',member);
         let payload = {};
         if(err){
             payload.err= err;
@@ -251,6 +251,69 @@ const memberModel = {
             await db.execute(sql.query, sql.values);
             member = await memberModel.getMemberBy({
                 mb_email: profile.email 
+            });
+        }
+        return member;
+    },
+    async loginKakao(req, profile){
+        let member = null;
+        try{ // 이미 회원이 있는지 확인
+            member = await memberModel.getMemberBy({
+                mb_email: profile._json.kakao_account.email
+            });
+            
+        } catch(e) { // 회원정보가 없으면 새로 db에 저장
+            const at = moment().format('LT');
+            const ip = getIp(req);
+            const data = {
+                mb_id : profile.id,
+                mb_password : '',
+                mb_provider : profile.provider,
+                mb_name : profile._json.properties.nickname,
+                mb_gender : profile._json.kakao_account.gender == 'male' ? 'M' : 'F',
+                mb_email : profile._json.kakao_account.email,
+                mb_photo : profile._json.properties.thumbnail_image,
+                mb_level : await getDefaultMemberLevel(),
+                mb_create_at: at,
+                mb_create_ip: ip,
+                mb_update_at: at,
+                mb_update_ip: ip,
+            };
+            const sql = sqlHelper.Insert(TABLE.MEMBER, data);
+            await db.execute(sql.query, sql.values);
+            member = await memberModel.getMemberBy({
+                mb_email: profile._json.kakao_account.email
+            });
+        }
+        return member;
+    },
+    async loginNaver(req, profile){
+        let member = null;
+        try{ // 이미 회원이 있는지 확인
+            member = await memberModel.getMemberBy({
+                mb_email: profile._json.email
+            });
+            
+        } catch(e) { // 회원정보가 없으면 새로 db에 저장
+            const at = moment().format('LT');
+            const ip = getIp(req);
+            const data = {
+                mb_id : profile.id,
+                mb_password : '',
+                mb_provider : profile.provider,
+                mb_name : profile._json.nickname,
+                mb_email : profile._json.email,
+                mb_photo : profile._json.profile_image,
+                mb_level : await getDefaultMemberLevel(),
+                mb_create_at: at,
+                mb_create_ip: ip,
+                mb_update_at: at,
+                mb_update_ip: ip,
+            };
+            const sql = sqlHelper.Insert(TABLE.MEMBER, data);
+            await db.execute(sql.query, sql.values);
+            member = await memberModel.getMemberBy({
+                mb_email: profile._json.email
             });
         }
         return member;

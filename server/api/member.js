@@ -77,7 +77,7 @@ router.get('/findPw', async(req,res)=>{
 router.patch('/modifyPassword', async(req, res)=>{
     const result = await modelCall(memberModel.modifyPassword, req.body)
     res.json(result)
-})
+});
 
 // 구글 로그인 요청
 router.get('/loginGoogle', passport.authenticate("google", { scope: ["email", "profile"] }));
@@ -87,9 +87,37 @@ router.get('/google-callback',  (req, res)=>{
 	passport.authenticate('google', async function (err, member) {
 		// console.log("member",member);
 		// console.log("err", err);
-		const result = await modelCall(memberModel.googleCallback, req, res,  err, member);
+		const result = await modelCall(memberModel.socialCallback, req, res,  err, member);
 		res.end(result);
 	})(req, res);
-})
+});
+
+// 카카오 로그인 요청
+router.get('/loginKakao', passport.authenticate("kakao"));
+
+// 카카오 로그인 콜백
+router.get('/kakao-callback',  (req, res)=>{
+	passport.authenticate('kakao', async function (err, member) {
+		// console.log("member1111===>",member);
+		// console.log("err", err);
+		const result = await modelCall(memberModel.socialCallback, req, res,  err, member);
+		res.end(result);
+        //res.json(member);
+	})(req, res);
+});
+
+// 네이버 로그인 요청
+router.get('/loginNaver', passport.authenticate("naver"));
+
+// 네이버 로그인 콜백
+router.get('/naver-callback',  (req, res)=>{
+	passport.authenticate('naver', async function (err, member) {
+		//console.log("naver member===>",member);
+		//res.json(member);
+        // console.log("err", err);
+		const result = await modelCall(memberModel.socialCallback, req, res,  err, member);
+		res.end(result);
+	})(req, res);
+});
 
 module.exports = router;
