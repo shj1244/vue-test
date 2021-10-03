@@ -21,7 +21,7 @@ function clearMemberField(member) {
         member.mb_leave_at = moment(member.mb_leave_at).format('LT');
     }
     if (member.mb_birth) {
-        member.mb_birth = moment(member.mb_birth).format('LT');
+        member.mb_birth = moment(member.mb_birth).format('L');
     }
     return member;
 }
@@ -97,6 +97,9 @@ const memberModel = {
         //console.log(row.affecttedRows);
         //console.log('가입', row)
         return row.affectedRows == 1;
+    },
+    async updateMember(req){
+        return {body : req.body, file : req.files};
     },
     async getMemberBy(form, cols = []) {
         // {mb_id : test, mb_password : hash}
@@ -317,6 +320,24 @@ const memberModel = {
             });
         }
         return member;
+    },
+    async checkPassword(req){
+        if(!req.user){
+            throw new Error('로그인 되어 있지 않습니다.');
+
+        }
+        const data = {
+            mb_id : req.user.mb_id,
+            mb_password : await jwt.generatePassword(req.body.mb_password)
+        };
+        const sql = sqlHelper.SelectSimple(TABLE.MEMBER, data, ['COUNT(*) AS cnt']);
+        const [[{cnt}]] = await db.execute(sql.query, sql.values);
+        
+        if(cnt == 0){
+            throw new Error('비밀번호가 일치 하지 않습니다.');
+        } else { 
+            return true;
+        }
     }
 }
 

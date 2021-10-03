@@ -13,11 +13,13 @@
                 </div>
                 <v-form 
                     v-if="options.type ==='prompt'" 
-                    ref="form" 
+                    ref="form"
+                    @submit.stop="ok"
                     v-model="valid" 
                     lazy-validation
                 >
                     <v-text-field 
+                        :type="options.formType"
                         v-model.trim="text" 
                         :rules="[ (v)=> !!v || '필수입력입니다.']"
                     ></v-text-field>

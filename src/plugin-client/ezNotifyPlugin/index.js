@@ -6,6 +6,7 @@ const defalutOption = {
     type :"prompt",
     width : 300,
     text : "",
+    formType : 'text',
 }
 
 export default {

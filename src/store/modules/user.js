@@ -39,6 +39,12 @@ export const actions = {
         //console.log('data',data );
         return data;
     },
+    async updateMember({ commit }, form) {
+        const { $axios } = Vue.prototype;
+        const data = await $axios.patch(`/api/member`, form);
+        //console.log('data',data );
+        return data;
+    },
     async signInLocal({ commit }, form) {
         const { $axios } = Vue.prototype;
         const data = await $axios.post(`/api/member/loginLocal`, form);
@@ -47,6 +53,12 @@ export const actions = {
             commit('SET_TOKEN', data.token);
             //VueCookies.set('token', data.token);
         }
+        return !!data;
+    },    
+    async checkPassword({ commit }, form) {
+        const { $axios } = Vue.prototype;
+        const data = await $axios.post(`/api/member/checkPassword`, form);
+
         return !!data;
     },
     async signOut({commit, state}){

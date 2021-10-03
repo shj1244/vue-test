@@ -51,7 +51,7 @@ export default {
     data(){
         return{
             loading : false,
-            isCheck : !this.cbCheck,
+            isCheck : this.origin ? true : !this.cbCheck,
             errMsg : "",
             successMsg : "",
         };
