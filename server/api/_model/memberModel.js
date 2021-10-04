@@ -2,6 +2,7 @@ const fs = require('fs');
 const db = require('../../plugins/mysql');
 const jwt = require('../../plugins/jwt');
 const sendMailer = require('../../plugins/sendMailer');
+const path = require('path');
 
 const sqlHelper = require('../../../util/sqlHelper');
 const TABLE = require('../../../util/TABLE');
@@ -79,10 +80,12 @@ const memberModel = {
        
         //DB에 인서트 하기 전에 이미지는 null로 설정
         delete payload.mb_image;
+        const fileName = jwt.getRandToken(16);
         //이미지 업로드 처리
         if(req.files && req.files.mb_image){
+            payload.mb_photo = `/upload/memberPhoto/${fileName}.jpg`
             //console.log(MEMBER_PHOTO_PATH);
-            req.files.mb_image.mv(`${MEMBER_PHOTO_PATH}/${payload.mb_id}.jpg`,(err)=>{
+            req.files.mb_image.mv(`${MEMBER_PHOTO_PATH}/${payload.fileName}.jpg`,(err)=>{
                 //console.log("img upload err",err)
                 if(err) {
                     console.log("Member image upload err",err)
@@ -99,7 +102,91 @@ const memberModel = {
         return row.affectedRows == 1;
     },
     async updateMember(req){
-        return {body : req.body, file : req.files};
+        
+        //날짜 및 현재시간으로 나옴.
+        const at = moment().format('LT');
+        const ip = getIp(req);
+
+        const payload = {
+            ...req.body,
+            //mb_password : 암호화
+            mb_update_at: at,
+            mb_update_ip: ip,
+        };
+       
+        // 레벨은 관리자모드 admMode true
+        const admMode = payload.admMode;
+        const mb_id = payload.mb_id;
+        const deleteImage = payload.deleteImage;
+        //const mb_password = payload.mb_password;
+        delete payload.admMode;
+        delete payload.mb_id;
+        delete payload.deleteImage;
+        //delete payload.mb_password;
+
+        // 비밀번호 값이 있으면 변경
+        if(payload.mb_password){
+            payload.mb_password = jwt.generatePassword(payload.mb_password);
+        } else { 
+            delete payload.mb_password;
+        }
+
+        // 이미지 업로드 처리
+        delete payload.mb_image;
+        const mb_photo = payload.mb_photo;
+        //delete payload.mb_photo;
+
+        const photoPathInfo = path.parse(mb_photo);
+        const oldName = photoPathInfo.name;        
+        const oldFile = `${MEMBER_PHOTO_PATH}/${oldName}.jpg`;
+        const cachePath = `${MEMBER_PHOTO_PATH}/.cache`;
+        
+        if(deleteImage || req.files && req.files.mb_image){
+            // true 이면 기존 이미지 삭제
+            payload.mb_photo = '';
+            try{
+                fs.unlinkSync(oldFile);
+                 const cacheDir = fs.readdirSync(cachePath); // 하나의 데이터씩 나누어 출력 
+                // 캐쉬파일 삭제
+                for( const p of cacheDir){
+                    if(p.startsWith(oldName)){
+                        try{
+                            fs.unlinkSync(`${cachePath}/${p}`);
+                        }catch(e){
+                            console.log(`delete ${p} error`, e.message);
+                        }
+                    }
+                }
+                // cacheDir.forEach(p => {
+                //     if(p.startsWith(oldName)){
+                //         try{                    
+                //             fs.unlinkSync(`${cacheDir}/${p}`);
+                //         }catch(e){}
+                //     }
+                // })
+            } catch(e) {
+                //console.log("file delete error", e.message);
+            }
+
+        }
+        //이미지 업로드 처리
+        if(req.files && req.files.mb_image){
+            // 새로운이미지 이름 생성
+            const newName = jwt.getRandToken(16);
+            payload.mb_photo = `/upload/memberPhoto/${newName}.jpg`;
+            const newFile = `${MEMBER_PHOTO_PATH}/${newName}.jpg`;
+            req.files.mb_image.mv(newFile,(err)=>{
+                //console.log("img upload err",err)
+                if(err) {
+                    console.log("Member-Modify image upload err",err)
+                }
+            });
+            
+        }
+        const sql = sqlHelper.Update(TABLE.MEMBER, payload, { mb_id });
+        const [row] = await db.execute(sql.query, sql.values);
+
+        return await memberModel.getMemberBy({mb_id});
     },
     async getMemberBy(form, cols = []) {
         // {mb_id : test, mb_password : hash}

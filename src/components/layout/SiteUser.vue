@@ -79,8 +79,8 @@ export default {
         },
 
         async openDialog(){
-            this.dialog = true;
-            /* if(!this.member.mb_provider){
+            //this.dialog = true;
+            if(!this.member.mb_provider){
                 const mb_password = await this.$ezNotify.prompt(
                     '비밀번호를 입력하세요.', 
                     "회원정보 수정", 
@@ -92,7 +92,7 @@ export default {
                 }
             }else{
                 this.dialog = true;
-            } */            
+            }            
         },
         closeDialog(){
             this.dialog = false;        
@@ -101,11 +101,11 @@ export default {
             this.isLoading = true;
             const data = await this.updateMember(form);
             this.isLoading = false;
-            /* if (data) {
-                const mb_name = form.get('mb_name')
-                this.$toast.info(`${mb_name}님 회원가입 하셨습니다.`);
-                this.$router.push("./login");
-            } */
+            if (data) {
+                this.$toast.info(`${this.$store.state.user.member.mb_name}님 정보 수정하였습니다.`);
+                this.closeDialog();
+                //this.$router.push("./login");
+            }
         },
         async checkEmail(email) {
             const data = await this.duplicateCheck({

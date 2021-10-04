@@ -160,7 +160,7 @@ export default {
       }
       //formData.append('mb_image', this.mb_image);
       this.$emit("onSave", formData);
-      console.log("formData===========>"+formData);
+      //console.log("formData===========>"+formData);
     },
   },
 };

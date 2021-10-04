@@ -56,6 +56,10 @@
             :prepend-icon="null"
             accept="image/jpg,image/png,image/jpeg,image/bmp"
         />
+        <v-checkbox
+          v-model="form.deleteImage"
+          label="삭제"
+        ></v-checkbox>
     </div>
 
     <input-radio
@@ -146,7 +150,7 @@ export default {
         { label: "남자", value: "M" },
         { label: "여자", value: "F" },
       ],
-      confirmPw: "abcd1234",
+      confirmPw: "",
     };
   },
   computed: {
@@ -156,6 +160,7 @@ export default {
       this.form = deepCopy(this.member);
       this.form.mb_password= "",
       this.form.admMode= this.admMode;
+      this.form.deleteImage=false // true 이면 기존이미지 삭제
       delete this.form.mb_create_at;
       delete this.form.mb_create_ip;
       delete this.form.mb_leave_at;
@@ -183,7 +188,7 @@ export default {
       }
       //formData.append('mb_image', this.mb_image);
       this.$emit("onSave", formData);
-      console.log("formData===========>"+formData);
+      //console.log("formData===========>"+formData);
     },
   },
 };

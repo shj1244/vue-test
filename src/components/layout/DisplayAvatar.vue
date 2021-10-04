@@ -29,19 +29,26 @@ export default {
     watch : {
         member(){
             this.hasImage = true;
+            this.memberPhoto = '';
         }
     },
     computed : {
         memberPhoto(){
+            if(this.member.mb_provider){
+                return this.member.memberPhoto;
+            } else {
+                // 경로.jpg?w=32&h=32
+                return this.member.mb_photo + '?w=32&h=32';
+            }
             //return this.member.mb_photo || `\\upload/memberPhoto\\${member.mb_id}.jpg?w=32&h=32` window에서 실행할때
-            return this.member.mb_photo || `/upload/memberPhoto/${this.member.mb_id}.jpg?w=32&h=32`
+            //return this.member.mb_photo || `/upload/memberPhoto/${this.member.mb_id}.jpg?w=32&h=32`
         }
     },
     methods : {
         imageError(){
             this.hasImage = false;
         }
-    }
+    },
 }
 </script>
 

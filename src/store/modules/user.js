@@ -41,9 +41,14 @@ export const actions = {
     },
     async updateMember({ commit }, form) {
         const { $axios } = Vue.prototype;
+        commit('SET_MEMBER', null);
         const data = await $axios.patch(`/api/member`, form);
+        
+        if(data){
+            commit('SET_MEMBER', data);
+        }
         //console.log('data',data );
-        return data;
+        return !!data;
     },
     async signInLocal({ commit }, form) {
         const { $axios } = Vue.prototype;

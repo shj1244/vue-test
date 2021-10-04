@@ -39,7 +39,7 @@ export default {
   },
   data(){
     return {
-      title : "My Home"
+      title : "Vue-test Shin"
     }
   },
   /* beforeCreate(){

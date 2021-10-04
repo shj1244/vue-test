@@ -92,7 +92,7 @@ app.get('*', (req, res) => {
 	const stream = renderer.renderToStream(ctx);
 	stream.on('end', () => {
 		const memSize = Object.entries(process.memoryUsage())[0][1];
-		console.log("스트림 렌더 종료 MemSize", (memSize / 1024 / 1024).toFixed(4));
+		//console.log("스트림 렌더 종료 MemSize", (memSize / 1024 / 1024).toFixed(4));
 			
 		if(process.platform == 'linux'){
 			if(memSize > 150000000) {

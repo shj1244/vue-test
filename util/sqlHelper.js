@@ -35,7 +35,7 @@ const sqlHelper = {
     },
     Update(table, data, where) {
         let query = `UPDATE ${table} SET {1} WHERE {2}`;
-
+        //console.log("sqlhelper Update sql====>",query)
         const keys = Object.keys(data);
         const sets = [];
         const values = [];
