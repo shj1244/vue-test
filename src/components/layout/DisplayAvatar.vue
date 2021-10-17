@@ -29,13 +29,13 @@ export default {
     watch : {
         member(){
             this.hasImage = true;
-            this.memberPhoto = '';
+            //this.member.mb_photo = '';
         }
     },
     computed : {
         memberPhoto(){
             if(this.member.mb_provider){
-                return this.member.memberPhoto;
+                return this.member.mb_photo;
             } else {
                 // 경로.jpg?w=32&h=32
                 return this.member.mb_photo + '?w=32&h=32';

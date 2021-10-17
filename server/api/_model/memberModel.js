@@ -133,7 +133,7 @@ const memberModel = {
 
         // 이미지 업로드 처리
         delete payload.mb_image;
-        const mb_photo = payload.mb_photo;
+        const mb_photo = payload.mb_photo || '';
         //delete payload.mb_photo;
 
         const photoPathInfo = path.parse(mb_photo);
@@ -299,7 +299,7 @@ const memberModel = {
         let payload = {};
         if(err){
             payload.err= err;
-        } else {
+        }else {
             // 토큰 만들고 쿠키 생성
             const token = jwt.getToken(member);
             req.body.mb_id= member.mb_id;

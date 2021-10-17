@@ -6,6 +6,7 @@ const memberModel = require('../api/_model/memberModel');
 const GoogleStrategy = require( 'passport-google-oauth2').Strategy;
 const KakaoStrategy = require('passport-kakao').Strategy;
 const NaverStrategy = require('passport-naver').Strategy;
+const {LV} = require('../../util/level')
 
 const { 
     GOOGLE_CLIENT_ID, 
@@ -19,6 +20,22 @@ const {
 //const CALLBACK_URL = DEV_ENV=='DEV' ? `http://localhost:${VUE_APP_SERVER_PORT}` : `https://${DB_HOST}`; 
 //console.log("CALLBACK_URL====>", DEV_ENV, CALLBACK_URL)
 
+function loginRules(member) {
+    //console.log("탈퇴에러ㅓㅓㅓㅓㅓㅓㅓㅓㅓ",member)
+    if(member.mb_leave_at){
+        return '탈퇴 회원입니다.';
+    }
+
+    switch (member.mb_level){
+        case LV.AWAIT : 
+            return '대기 회원입니다.';
+        case LV.BLOCK : 
+            return '차단 회원입니다.';
+    }
+    
+
+}
+
 module.exports = (app) => {
     app.use(passport.initialize());
 
@@ -31,6 +48,11 @@ module.exports = (app) => {
             try {
                 mb_password = jwt.generatePassword(mb_password);
                 const member = await memberModel.getMemberBy({ mb_id, mb_password });
+                const msg = loginRules(member);
+                //loginRules(member,"LocalStrategy")
+                if(msg){
+                    return done(null, null, msg);
+                }
                 return done(null, member);
             } catch (e) {
                 console.log(e.message);
@@ -50,6 +72,11 @@ module.exports = (app) => {
         //console.log("profile===>",profile);
         if(profile && profile.id){
             const member = await memberModel.loginGoole(request,profile);
+            //loginRules(member,"GoogleStrategy")
+            const msg = loginRules(member);
+            if(msg){
+                return done(msg, null, null);
+            }                
             return done(null, member);
         } else {
             return done("로그인 실패", null);
@@ -69,6 +96,11 @@ module.exports = (app) => {
         async (request, accessToken, refreshToken, profile, done) => {
             if(profile && profile.id){
                 const member = await memberModel.loginKakao(request,profile);
+                const msg = loginRules(member);
+                //loginRules(member,"KakaoStrategy")
+                if(msg){
+                    return done(msg, null, null);
+                }                
                 return done(null, member);
             } else {
                 return done("로그인 실패", null);
@@ -87,6 +119,11 @@ module.exports = (app) => {
         //console.log("Naver profile===>",profile);
         if(profile && profile.id){
             const member = await memberModel.loginNaver(request,profile);
+            const msg = loginRules(member);
+            //loginRules(member,"NaverStrategy")
+            if(msg){
+                return done(msg, null, null);
+            }  
             return done(null, member);
         } else {
             return done("로그인 실패", null);
@@ -104,6 +141,11 @@ module.exports = (app) => {
         if(!mb_id) return next();
         try{
             const member = await memberModel.getMemberBy({mb_id});
+            //loginRules(member,"use")
+            const msg = loginRules(member);
+            if(msg){
+                return next();
+            }
             req.login(member, { session :false}, (err)=> { });
         } catch(e) {
             console.log('auth err', e)

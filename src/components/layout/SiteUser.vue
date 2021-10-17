@@ -32,6 +32,7 @@
                 :isLoading="isLoading"
                 :cbCheckEmail="checkEmail"
                 @onSave="save"
+                @onLeave="leave"
             />
         </v-card>
     </v-dialog>
@@ -66,7 +67,7 @@ export default {
         this.getDarkMode();
     },
     methods : {
-        ...mapActions("user", ["duplicateCheck", "checkPassword", "updateMember"]),
+        ...mapActions("user", ["duplicateCheck", "checkPassword", "updateMember", 'signOut']),
         setDarkMode(mode){
             //스토리지에 저장
             localStorage.setItem('darkMode', mode ? 'dark' : 'light');
@@ -86,7 +87,7 @@ export default {
                     "회원정보 수정", 
                     { icon:"mdi-alert", formType: "password" }
                 );
-
+                
                 if (mb_password){
                     this.dialog = await this.checkPassword({ mb_password });
                 }
@@ -105,6 +106,35 @@ export default {
                 this.$toast.info(`${this.$store.state.user.member.mb_name}님 정보 수정하였습니다.`);
                 this.closeDialog();
                 //this.$router.push("./login");
+            }
+        },
+        async leave() {
+            const result = await this.$ezNotify.confirm(
+                '정말로 탈퇴하시겠습니까?', 
+                '회원탈퇴',
+                {
+                    icon : 'mdi-alert',
+                }
+            )
+            if(!result) return;
+
+            this.isLoading = true;
+
+            const form = {
+                mb_id: this.member.mb_id,
+                mb_leave_at: this.$moment().format('LT'),
+            };
+
+            const data = await this.updateMember(form);
+            this.isLoading = false;
+            if (data) {
+                //this.$toast.info(`${this.$store.state.user.member.mb_name}님 탈퇴하였습니다.`);
+                this.closeDialog();
+                const mb_name = await this.signOut();
+                this.$toast.info(`${mb_name}님 탈퇴 하였습니다.`);
+                if(this.$route.name != 'Home'){
+                    this.$router.push('/');
+                }
             }
         },
         async checkEmail(email) {
