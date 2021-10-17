@@ -32,13 +32,13 @@ export default {
     data() {
         return {
 
-        }
+        } 
     },
     methods: {
         addConfig() {
             console.log("설정 클릭")
             this.$refs.dialog.open();
-        },
+        }, 
         test(form) {
             console.log("설정 클릭",form)
             this.$refs.dialog.close();
