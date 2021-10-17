@@ -8,7 +8,7 @@ const option = {
     type : "alert",
     width : 400,
     //text : "",
-    text : "abcd1234",
+    text : "shj1244",
 }
 
 Vue.use(ezNotify, vuetify, option)

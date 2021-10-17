@@ -1,7 +1,8 @@
 import Vue from "vue";
 import qs from "qs";
+import {LV} from "../../../util/level";
+
 export const state = () => ({ //상태관리
-    member: null,
 });
 
 export const mutations = {
@@ -14,7 +15,12 @@ export const mutations = {
 };
 
 export const getters = {
-
+    isAdmin(state) {
+        return state.member && state.member.mb_level >= LV.ADMIN;
+    },
+    isAdmin(state) {
+        return state.member && state.member.mb_level >= LV.ADMIN;
+    }
 };
 
 export const actions = {

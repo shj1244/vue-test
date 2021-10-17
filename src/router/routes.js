@@ -30,6 +30,12 @@ const routes = [
       component: () => import(/* webpackChunkName: "modifyPassword" */ '../views/member/modifyPassword.vue')
     },
     {
+      path: '/adm/config',
+      name: 'AdmConfig',
+      component: () => import(/* webpackChunkName: "AdmConfig" */ '../views/admin/Config.vue')
+    },
+    ,
+    {
       path: '*',
       name: 'Error',
       component: () => import(/* webpackChunkName: "error" */ '../views/Error.vue')
