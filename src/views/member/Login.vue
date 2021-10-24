@@ -1,12 +1,12 @@
 <template>
   <div class="d-flex justify-center align-center" style="height: 100%">
     <v-card max-width="400" width="100%" elevation="10" class="ma-4">
-      <v-toolbar>
+      <v-toolbar class="centerTitle">
         <v-toolbar-title>
           <site-title />
         </v-toolbar-title>
       </v-toolbar>
-      <v-tabs v-model="tabs" background-color="primary" dart>
+      <v-tabs v-model="tabs" background-color="primary" dark>
         <v-tab v-for="item in items" :key="item" style="flex: 1">
           {{ item }}
         </v-tab>

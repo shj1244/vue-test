@@ -57,8 +57,10 @@ app.use('/upload/:_path', thumbnail(path.join(__dirname, './upload')));
 app.use(express.static(path.join(__dirname, "../dist")));
 
 // api router
-const memberRouter = require('./api/member')
-app.use('/api/member', memberRouter)
+//const memberRouter = require('./api/member')
+const autoRoute = require('./autoRoute');
+autoRoute('/api' , app)
+//app.use('/api/member', memberRouter)
 // 위에 두줄을 app.use('/api/member', require('./api/member'))
 app.use('/api/*', (req, res) => {
 	res.json({ err: '요청하신 API가 없습니다.' });
@@ -66,12 +68,10 @@ app.use('/api/*', (req, res) => {
 
 // Vue SSR
 const { createBundleRenderer } = require('vue-server-renderer');
-const exp = require('constants');
+//const exp = require('constants');
 const template = fs.readFileSync(path.join(__dirname, 'index.template.html'), 'utf-8');
 const serverBundle = require(path.join(__dirname, '../dist/vue-ssr-server-bundle.json'));
 const clientManifest = require(path.join(__dirname, '../dist/vue-ssr-client-manifest.json'));
-
-
 
 app.get('*', (req, res) => {
 	const renderer = createBundleRenderer(serverBundle, {

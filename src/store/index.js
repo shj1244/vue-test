@@ -79,6 +79,18 @@ const store = new Vuex.Store({
 				await dispatch('user/initUser');
 			}
 			commit('SET_APP_READY');
+		},
+		async configDuplicateCheck(ctx, {field,value}) {
+			const { $axios } = Vue.prototype;
+			const data = await $axios.get(`/api/config/duplicateCheck/${field}/${value}`);
+			//console.log('data',data );
+			return data;
+		},
+		async configSave(ctx, form) {
+			const { $axios } = Vue.prototype;
+			const data = await $axios.post('/api/config', form);
+			//console.log('data',data );
+			return data;
 		}
 	},
 	modules

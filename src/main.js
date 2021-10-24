@@ -3,13 +3,12 @@ import App from './App.vue'
 import {createRouter} from './router'
 import {createStore} from './store'
 import {sync} from 'vuex-router-sync'
-import vuetify from './plugins/vuetify'
 
+import vuetify from './plugins/vuetify'
 import '@babel/polyfill'
 import 'roboto-fontface/css/roboto/roboto-fontface.css'
 import '@mdi/font/css/materialdesignicons.css'
-import './plugins/axios'
-import './plugins/moment'
+import './plugins';
 
 import titleMixin from './mixins/title-mixin';
 

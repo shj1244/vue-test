@@ -3,6 +3,8 @@ import qs from "qs";
 import {LV} from "../../../util/level";
 
 export const state = () => ({ //상태관리
+    member : null,
+    token : null,
 });
 
 export const mutations = {

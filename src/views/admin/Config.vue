@@ -10,7 +10,7 @@
 
         <!-- 설정 다이얼로그 -->
         <ez-dialog label="설정추가" ref="dialog" max-width="500" dark color="primary">
-            <config-form @save="test"></config-form>
+            <config-form @save="save" :keyCheck="keyCheck"></config-form>
         </ez-dialog>
             <!-- //설정 다이얼로그 -->
 
@@ -23,9 +23,11 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
 import EzDialog from '../../components/etc/EzDialog.vue';
 import TooltipBtn from '../../components/etc/TooltipBtn.vue'
 import ConfigForm from './ConfigComponents/ConfigForm.vue';
+
 export default {
     components: { TooltipBtn, EzDialog, ConfigForm },
     name : "admConfig",
@@ -35,13 +37,20 @@ export default {
         } 
     },
     methods: {
+        ...mapActions(['configDuplicateCheck', 'configSave']),
         addConfig() {
             console.log("설정 클릭")
             this.$refs.dialog.open();
         }, 
-        test(form) {
-            console.log("설정 클릭",form)
+        async save(form) {
+            console.log("config save",form);
+            const data  = await this.configSave(form);
             this.$refs.dialog.close();
+        },
+        async keyCheck(value){
+            // 키 중복검사
+            const data = await this.configDuplicateCheck({field: 'cf_key', value})
+            return data
         }
     }
 }
