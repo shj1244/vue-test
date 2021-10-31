@@ -21,6 +21,8 @@
             label="키" 
             v-model="form.cf_key" 
             :cbCheck="keyCheck"
+            :origin="orginKey"
+            :readonly="!!item"
             :rules="[
                 rules.require({label : '키'}),
                 rules.alphaNum(),
@@ -50,6 +52,7 @@ import InputDuplicateCheck from '../../../components/InputForms/InputDuplicateCh
 import TypeValue from './TypeValue.vue'
 import {LV} from '../../../../util/level'
 import validateRules from '../../../../util/validateRules'
+import { deepCopy, findParentWm } from '../../../../util/lib';
 
 export default {
     components: { InputDuplicateCheck, TypeValue },
@@ -58,40 +61,84 @@ export default {
         keyCheck : {
             type : Function,
             default : null
+        },
+        groupItems : {
+            type : Array,
+            default : [],
+        },
+        item : {
+            type : Object,
+            default : null
         }
     },
     data() {
         return {
             valid : true,
-            form : {
-                cf_key: "", // 중목
-                cf_val : "", // 타입에 따라서
-                cf_name : "", // 
-                cf_group : "", // 
-                cf_level : "", // 접근
-                cf_type : "String", // 저장형식
-                cf_comment : "", // 설명
-                cf_client : 0, //
-            },
-            groupItems : [],
+            form : null,
             typeItems : ['String', 'Number', 'Json', 'Secret'],
+            orginKey: null,
+            // orginKey() {
+            //     return this.item? this.item.cf_key : null;
+            // }
         }
     },
     computed : {
         LV : () => LV,
         rules : () => validateRules,
+        
+    },
+    created(){
+        this.init();
+    },
+    watch:{
+        item(){
+            //console.log('watch', this.item)
+            this.init();
+        }
     },
     methods : {
+        init(){
+            if(this.item) {
+                this.form = deepCopy(this.item);
+                this.orginKey = this.item.cf_key;
+            }else {
+                this.form = {
+                    cf_key: "", // 중목
+                    cf_val : "", // 타입에 따라서
+                    cf_name : "", // 
+                    cf_group : "", // 
+                    cf_level : "", // 접근
+                    cf_type : "String", // 저장형식
+                    cf_comment : "", // 설명
+                    cf_client : 0, //
+                };
+                this.orginKey = null;
+                
+            }
+            if(this.$refs.form){
+               this.$refs.form.resetValidation();
+            }
+            //console.log('init', this.form);
+        },
         async save() {
             this.$refs.form.validate();
             await this.$nextTick();
             if(!this.valid) return;
             if(!this.$refs.cfKey.validate()) return;
-            this.$emit('save', this.form);
+            if(!this.item){
+                let i = 0;
+                const parent = findParentWm(this, 'admConfig')
+                parent.items.forEach(item => {
+                    if(item.cf_group == this.form.cf_group){
+                        i++;
+                    }
+                })
+                this.form.cf_sort = i;
+            }
+            //console.log(this.form);
+            //return;
+            this.$emit("save", this.form)
         },
-        // 그룹 아이템 가져오기
-        async fetchGroupItems() {},
-        
     },
 }
 </script>
