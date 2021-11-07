@@ -25,12 +25,13 @@
                 :key="item.cf_key"
                 :item="item"
                 @update="updateConfig"
+                @remove="removeConfig"
             >
             </config-item>
         </draggable>
 
         <!-- 설정 다이얼로그 -->
-        <ez-dialog label="설정추가" ref="dialog" max-width="500" dark color="primary">
+        <ez-dialog label="설정추가" ref="dialog" max-width="500" dark color="primary" persistent>
             <config-form @save="save" :keyCheck="keyCheck" :groupItems="groupItems" :item="item"></config-form>
         </ez-dialog>
         <!-- //설정 다이얼로그 -->
@@ -76,9 +77,7 @@ export default {
     },
     watch: {
         group(){
-            this.curItems = this.items.filter((item)=>{
-                return item.cf_group == this.groupName;
-            });
+            this.setCurItems();
         }
     },
     mounted(){
@@ -88,15 +87,48 @@ export default {
         ...mapActions(['configDuplicateCheck', 'configSave']),
         addConfig() {
             this.item = null;
+            if(this.$refs.ConfigForm){
+                this.$refs.ConfigForm.init();
+            }            
             this.$refs.dialog.open();
         },
         updateConfig(item) {
             this.item = item;
+            if(this.$refs.ConfigForm){
+                this.$refs.ConfigForm.init();
+            }
             this.$refs.dialog.open();
         },
+        async removeConfig(item) {
+            // 정말 삭제?
+            const result = await this.$ezNotify.confirm(
+                `<b>[${item.cf_name}]</b> 삭제 하시겠습니까?`,
+                '설정항목삭제',
+                {icon : 'mdi-delete', iconColor: 'red'}
+            );
+            if(!result) return;
+            // DB 삭제
+            const data = await this.$axios.delete(`/api/config/${item.cf_key}`);
+            // DB 목록 업데이트
+            if(data) {
+                this.$toast.info(`[${item.cf_name}] 삭제 하였습니다.`);
+                const idx = this.items.indexOf(item); // 인덱스 가져오기
+                this.items.splice(idx, 1);
+                this.setCurItems();
+            }
+        },
         async save(form) {
-            console.log("config save",form);
             const data  = await this.configSave(form);
+            if(this.item) { // 수정
+                this.$toast.info(`[${form.cf_name}] 수정 하였습니다.`);
+                const idx = this.items.indexOf(this.item); // 인덱스 가져오기
+                console.log(idx);
+                this.items.splice(idx, 1, data);
+            } else { // 신규
+                this.$toast.info(`[${form.cf_name}] 추가 하였습니다.`);
+                this.items.push(data);
+            }
+            this.setCurItems();
             this.$refs.dialog.close();
         },
         async keyCheck(value){
@@ -120,7 +152,12 @@ export default {
                 // })
             });
             //console.log(arr);
-            const data = this.$axios.put('/api/config', this.curItems)
+            this.$axios.put('/api/config', this.curItems);
+        },
+        setCurItems(){
+            this.curItems = this.items.filter((item)=>{
+                return item.cf_group == this.groupName;
+            });
         }
     },
 }

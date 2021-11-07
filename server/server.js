@@ -4,10 +4,21 @@ const http = require('http');
 const path = require('path');
 const fs = require('fs');
 
+(async function(){ //전체 함수 시작지점
 // 앱 초기화
 const app = express();
 const port = process.env.VUE_APP_SERVER_PORT || 3000;
 const webServer = http.createServer(app);
+
+// 설치정보 - DB 정보 유무 판단
+
+
+// 설정정보 로드
+const configModel = require('./api/_model/configModel');
+console.log("설정 로그 전");
+await configModel.load();
+console.log("설정 로그 후");
+
 
 let isDisableKeepAlive = false;
 app.use((req, res, next)=>{
@@ -116,3 +127,5 @@ process.on('SIGINT', function(){
 		process.exit(0);
 	})
 })
+
+})(); //전체 함수 종료지점

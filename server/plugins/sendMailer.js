@@ -2,7 +2,7 @@ require('dotenv').config();
 const nodemailer = require('nodemailer');
 const { modelCall } = require('../../util/lib');
 
-const {NODEMAILER_USER, NODEMAILER_PASS} = process.env;
+const {NODEMAILER_USER, NODEMAILER_PASS} = siteConfig;
 
 const transPoter = nodemailer.createTransport({
     service : 'gmail',
