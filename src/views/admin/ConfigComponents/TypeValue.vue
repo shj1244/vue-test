@@ -81,7 +81,7 @@ export default {
         stringify() {
             const obj = JSON.parse(this.value);
             const str = jsonStringify(obj, {space:'  '});
-            console.log(str);
+            //console.log(str);
             return str
         },
         jsonView() {

@@ -11,7 +11,12 @@
             <v-tooltip top>
                 <template v-slot:activator="{on, attrs}">
                     <span v-on="on" v-bind="attrs" class="mr-2">
-                    <v-checkbox v-model="form.cf_client" color="primary" true-value="1" false-value="0"></v-checkbox>
+                    <v-checkbox 
+                        v-model="form.cf_client" 
+                        color="primary" 
+                        :true-value="1" 
+                        :false-value="0"
+                    ></v-checkbox>
                     </span>
                 </template>
                 <span>클라이언트</span>

@@ -13,7 +13,7 @@ module.exports = function(root, app) {
             if(moduleName == '/index') {
                 moduleName = '';
             }
-            console.log(`${root}${moduleName} : ${root}/${p.name}`);
+            //console.log(`${root}${moduleName} : ${root}/${p.name}`);
             app.use(`${root}${moduleName}`, require(`.${root}/${p.name}`));
         }
     })

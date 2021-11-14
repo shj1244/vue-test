@@ -15,9 +15,9 @@ const webServer = http.createServer(app);
 
 // 설정정보 로드
 const configModel = require('./api/_model/configModel');
-console.log("설정 로그 전");
+//console.log("설정 로그 전");
 await configModel.load();
-console.log("설정 로그 후");
+//console.log("설정 로그 후");
 
 
 let isDisableKeepAlive = false;
@@ -98,6 +98,7 @@ app.get('*', (req, res) => {
 		metas: `<!-- inject more metas -->`,
 		member : req.user || null,
 		token :req.cookies.token || null,
+		config : clientConfig,
 	};
 
 	const stream = renderer.renderToStream(ctx);
@@ -123,7 +124,7 @@ webServer.listen(port, () => {
 process.on('SIGINT', function(){
 	isDisableKeepAlive= true;
 	webServer.close(function(){
-		console.log('server Closed');
+		//console.log('server Closed');
 		process.exit(0);
 	})
 })

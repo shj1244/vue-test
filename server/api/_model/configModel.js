@@ -7,27 +7,40 @@ const configModel = {
     async load(){
         const sql = sqlHelper.SelectSimple(TABLE.CONFIG, null, ['cf_key', 'cf_val', 'cf_client', 'cf_type']);
         const [rows] = await db.execute(sql.query);
-        const config = {};
-        const clientConfig = {};
+        global.siteConfig = {};
+        global.clientConfig = {};
         for(const row of rows){
-            let val;
-            if(row.cf_type == "Json") {
-                val = JSON.parse(row.cf_val);
-            } else {
-                val = row.cf_val;
-            }
-
-            
-            if(row.cf_client == 1) {
-                clientConfig[row.cf_key] = val;
-            } else {
-                config[row.cf_key] = val;
-            }
+            configModel.setConfigItem(row);
         }
-        global.siteConfig = config;
-        global.clientConfig = clientConfig;
+
         // console.log('설정로드-----------------')
-        // console.log(config)
+        // console.log(siteConfig)
+        // console.log('clientConfig-----------------')
+        // console.log(clientConfig);
+    },
+    setConfigItem(item){
+        configModel.clearConfigItem(item.cf_key); // 설정 시 먼저 기존 데이터 삭제 
+
+        let val;
+        if(item.cf_type == "Json") {
+            val = JSON.parse(item.cf_val);
+        } else {
+            val = item.cf_val;
+        }
+        
+        if(item.cf_client == 1) {
+            clientConfig[item.cf_key] = val;
+        } else {
+            siteConfig[item.cf_key] = val;
+        }
+        //console.log('setConfigItem===>',item.cf_key,val);
+    },
+    clearConfigItem(cf_key){
+        // console.log('clearConfigItem===>',cf_key);
+        delete clientConfig[cf_key];
+        delete siteConfig[cf_key];
+        // console.log('설정로드-----------------')
+        // console.log(siteConfig)
         // console.log('clientConfig-----------------')
         // console.log(clientConfig);
     },
@@ -49,30 +62,34 @@ const configModel = {
             if(!isGrant(req, LV.ADMIN)){
                 throw new Error('관리자 설정 목록 권한이 없습니다.')
             }
+            const sort = {
+                cf_group : true,
+                cf_sort : true,
+            }
+    
+            const sql = sqlHelper.SelectSimple(TABLE.CONFIG, where, [] , sort);
+            const [rows] = await db.execute(sql.query, sql.values);
+            return rows;
         } else {
             // 일반
-            where.cf_client = 1;
+            //where.cf_client = 1;
+            return clientConfig;
         }
-        const sort = {
-            cf_group : true,
-            cf_sort : true,
-        }
-
-        const sql = sqlHelper.SelectSimple(TABLE.CONFIG, where, [] , sort);
-        const [rows] = await db.execute(sql.query, sql.values);
-        return rows;
     },
     async post(data){
 
         const sql = sqlHelper.InsertOrUpdate(TABLE.CONFIG, data);
         const [row] = await db.execute(sql.query, sql.values);
-        configModel.load(); // 설정다시 로드
+        configModel.setConfigItem(data); // 글로벌 지정 변수 (config)
         return data; //업데이트 된 값 넘겨주기
     },
-    async put(req){
-        
+    async put(req){ // 정렬
+        //{cf_key, cf_sort}
         req.body.forEach((item)=> {
-            configModel.post(item);
+            const {cf_key, cf_sort} = item;
+            const sql = sqlHelper.Update(TABLE.CONFIG, {cf_sort}, {cf_key});
+            db.execute(sql.query, sql.values);
+            //configModel.post(item);
         })
         return true;
     },
@@ -85,7 +102,7 @@ const configModel = {
         const sql = sqlHelper.DeleteSimple(TABLE.CONFIG, {cf_key});
         const [row] = await db.execute(sql.query, sql.values);
 
-        configModel.load(); // 설정다시 로드
+        configModel.clearConfigItem(cf_key); // 설정값 삭제
         return row.affectedRows == 1;
     }
 };

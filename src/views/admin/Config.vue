@@ -144,8 +144,13 @@ export default {
             // 현재 curItems 에 있는 정보로 cf_sort 업데이트 전체
             let i = 0;
             //const arr = []
+            const payload = [];
             this.curItems.forEach((item)=>{
                 item.cf_sort = i++;
+                payload.push({
+                    cf_key : item.cf_key, 
+                    cf_sort :item.cf_sort,
+                });
                 // arr.push({
                 //     cf_key : item.cf_key,
                 //     cf_sort :item.cf_sort,
