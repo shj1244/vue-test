@@ -36,7 +36,6 @@ const configModel = {
         //console.log('setConfigItem===>',item.cf_key,val);
     },
     clearConfigItem(cf_key){
-        // console.log('clearConfigItem===>',cf_key);
         delete clientConfig[cf_key];
         delete siteConfig[cf_key];
         // console.log('설정로드-----------------')
