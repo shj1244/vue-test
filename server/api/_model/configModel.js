@@ -13,7 +13,7 @@ const configModel = {
             configModel.setConfigItem(row, true);
         }
 
-        console.log('설정로드-----------------')
+        //console.log('설정로드-----------------')
         // console.log(siteConfig)
         // console.log('clientConfig-----------------')
         // console.log(clientConfig);

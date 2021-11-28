@@ -111,6 +111,9 @@ export default {
             const data = await this.$axios.delete(`/api/config/${item.cf_key}`);
             // DB 목록 업데이트
             if(data) {
+                if(data.cf_client){
+                    this.$socket.emit('config:remove', item.cf_key);
+                }
                 this.$toast.info(`[${item.cf_name}] 삭제 하였습니다.`);
                 const idx = this.items.indexOf(item); // 인덱스 가져오기
                 this.items.splice(idx, 1);
@@ -119,6 +122,15 @@ export default {
         },
         async save(form) {
             const data  = await this.configSave(form);
+            if(data.cf_client){
+                this.$socket.emit('config:update', {
+                    key : data.cf_key, 
+                    value : data.cf_val
+                });
+            } else if(this.item && this.item.cf_client){
+                this.$socket.emit('config:remove', data.cf_key);
+            }
+
             if(this.item) { // 수정
                 this.$toast.info(`[${form.cf_name}] 수정 하였습니다.`);
                 const idx = this.items.indexOf(this.item); // 인덱스 가져오기
@@ -128,6 +140,7 @@ export default {
                 this.$toast.info(`[${form.cf_name}] 추가 하였습니다.`);
                 this.items.push(data);
             }
+            
             this.setCurItems();
             this.$refs.dialog.close();
         },

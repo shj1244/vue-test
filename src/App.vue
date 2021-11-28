@@ -28,6 +28,7 @@ import SiteFooter from './components/layout/SiteFooter.vue';
 import SiteTitle from './components/layout/SiteTitle.vue';
 import SiteNavi from './components/layout/SiteNavi.vue';
 import SiteUser from './components/layout/SiteUser.vue';
+import { mapMutations } from 'vuex';
 
 export default {
   name: 'App',
@@ -41,8 +42,21 @@ export default {
     drawerWidth(){
       return this.$vuetify.breakpoint.xs? '100%' : '360';
     }
-  },  
+  },
+  mounted() {
+    this.$socket.on('config:update', (data) => {
+      this.SET_CONFIG(data)
+    })
+    this.$socket.on('config:remove', (key) => {
+      this.SET_CONFIG({key, value: null})
+    })
+  },
+  destroyed(){
+    this.$socket.off("config:update", update);
+    this.$socket.off("config:remove", remove);
+  },
   methods : {
+    ...mapMutations(['SET_CONFIG']),
     toggleDrawer(){
       this.drawer = !this.drawer;
     }

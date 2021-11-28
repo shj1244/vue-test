@@ -11,6 +11,9 @@ const app = express();
 const port = process.env.VUE_APP_SERVER_PORT || 3000;
 const webServer = http.createServer(app);
 
+const socket = require('./plugins/socket');
+socket(webServer);
+
 // 설치정보 - DB 정보 유무 판단
 
 
@@ -20,10 +23,10 @@ const configModel = require('./api/_model/configModel');
 await configModel.load();
 //console.log("설정 로그 후");
 
-setInterval(()=>{
-	console.log('test site == ', siteConfig.test1);
-	console.log('test clie == ', clientConfig.test1)
-}, 5000);
+// setInterval(()=>{
+// 	console.log('test site == ', siteConfig.test1);
+// 	console.log('test clie == ', clientConfig.test1)
+// }, 5000);
 
 let isDisableKeepAlive = false;
 app.use((req, res, next)=>{
@@ -122,7 +125,7 @@ app.get('*', (req, res) => {
 // 서버 응답
 webServer.listen(port, () => {
 	process.send('ready');
-	console.log(`http://localhost:${port}`)
+	//console.log(`http://localhost:${port}`)
 });
 
 

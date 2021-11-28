@@ -25,7 +25,13 @@
       <v-btn @click="axiosTest1">Test</v-btn>
       <v-btn @click="axiosTest2">Error Test</v-btn>
     </div>
-
+    <h1>Socket 테스트</h1>
+    <div>
+      <v-btn @click="joinRoom">방 입장</v-btn>
+      <v-btn @click="leaveRoom">방 퇴장</v-btn>
+      <v-btn @click="sendMsg">메세지 보내기</v-btn>
+      <div>{{$store.state.config.test1}}</div>
+    </div>
   </div>
 </template>
 <script>
@@ -41,6 +47,14 @@ export default {
     return {
       title : "Vue-test Shin"
     }
+  },
+  mounted() {
+    this.$socket.emit('room:msg', (data) =>{
+      console.log('room:msg', data)
+    });
+  },
+  destroyed() {
+    this.$socket.off('room:msg');
   },
   /* beforeCreate(){
     //console.log('Home.vue beforeCreate');
@@ -109,8 +123,18 @@ export default {
     async axiosTest2() {
       const result = await this.$axios.get('./api/errrrrrrrr/test');
       console.log(result);
-    }
-    
+    },
+    joinRoom(){
+      this.$socket.emit('room:join', 'roomtest');
+      console.log('join Room');
+    },
+    leaveRoom(){
+      this.$socket.emit('room:leave', 'roomtest');
+      console.log('leave Room');
+    },
+    sendMsg(){
+      this.$socket.emit('room:send', {msg : 'send message'});
+    },    
   }
 }
 </script>
