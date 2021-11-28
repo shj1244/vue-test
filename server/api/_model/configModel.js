@@ -10,16 +10,16 @@ const configModel = {
         global.siteConfig = {};
         global.clientConfig = {};
         for(const row of rows){
-            configModel.setConfigItem(row);
+            configModel.setConfigItem(row, true);
         }
 
-        // console.log('설정로드-----------------')
+        console.log('설정로드-----------------')
         // console.log(siteConfig)
         // console.log('clientConfig-----------------')
         // console.log(clientConfig);
     },
-    setConfigItem(item){
-        configModel.clearConfigItem(item.cf_key); // 설정 시 먼저 기존 데이터 삭제 
+    setConfigItem(item, isLoad = false){
+        configModel.clearConfigItem(item.cf_key, isLoad); // 설정 시 먼저 기존 데이터 삭제 
 
         let val;
         if(item.cf_type == "Json") {
@@ -33,11 +33,25 @@ const configModel = {
         } else {
             siteConfig[item.cf_key] = val;
         }
+
+        // 초기 로드가 아니면 메세지를 보낸다.
+        if(!isLoad) {
+            process.send({
+                type : 'config:update',
+                data : item,
+            });
+        }
         //console.log('setConfigItem===>',item.cf_key,val);
     },
-    clearConfigItem(cf_key){
+    clearConfigItem(cf_key, isLoad = false){
         delete clientConfig[cf_key];
         delete siteConfig[cf_key];
+        if(!isLoad){
+            process.send({
+                type : 'config:remove',
+                data : cf_key,
+            });
+        }
         // console.log('설정로드-----------------')
         // console.log(siteConfig)
         // console.log('clientConfig-----------------')

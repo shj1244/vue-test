@@ -3,6 +3,7 @@ const express = require('express');
 const http = require('http');
 const path = require('path');
 const fs = require('fs');
+require('./plugins/pm2Bus');
 
 (async function(){ //전체 함수 시작지점
 // 앱 초기화
@@ -19,6 +20,10 @@ const configModel = require('./api/_model/configModel');
 await configModel.load();
 //console.log("설정 로그 후");
 
+setInterval(()=>{
+	console.log('test site == ', siteConfig.test1);
+	console.log('test clie == ', clientConfig.test1)
+}, 5000);
 
 let isDisableKeepAlive = false;
 app.use((req, res, next)=>{
