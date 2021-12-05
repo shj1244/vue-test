@@ -35,7 +35,7 @@ export default {
       valid: true,
       form: {
         mb_id: "test22",
-        mb_password: "shj1244",
+        mb_password: "shj1243",
       },
     };
   },
