@@ -125,7 +125,7 @@ app.get('*', (req, res) => {
 // 서버 응답
 webServer.listen(port, () => {
 	process.send('ready');
-	//console.log(`http://localhost:${port}`)
+	console.log(`http://localhost:${port}`)
 });
 
 

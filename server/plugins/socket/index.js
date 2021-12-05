@@ -1,8 +1,19 @@
+require('dotenv').config();
 const  { Server } = require("socket.io");
+const redisAdapter = require('socket.io-redis');
 const configHandler = require('./configHandler');
+
+const { REDIS_HOST, REDIS_PORT } = process.env;
 
 module.exports = function(webServer) {
     const io = new Server(webServer);
+    try {
+        io.adapter(redisAdapter({ host: REDIS_HOST, port: REDIS_PORT }));
+    }catch(e) {
+        console.log('redis error',  REDIS_HOST, REDIS_PORT)
+        console.log(e);
+    }
+    
     
     io.on("connection", (socket) => {
         configHandler(io, socket);
@@ -33,7 +44,7 @@ module.exports = function(webServer) {
         });
 
         // socket.on('config:update', (data) => {
-        //     console.log('index.js server===>',data);
+        //     console.log('index.js server===>',da
         //     //io.emit('config:update', {rescive: '응답'})
         //     socket.broadcast.emit('config:update', {rescive: '브로드캐스트'})
         // })
