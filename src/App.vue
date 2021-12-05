@@ -43,23 +43,37 @@ export default {
       return this.$vuetify.breakpoint.xs? '100%' : '360';
     }
   },
+  socket() {
+    return {
+      "config:update" : (data) => {
+        this.SET_CONFIG(data);
+      },
+      "config:remove" : (key) => {
+        this.SET_CONFIG({key, value: null});
+      }    
+    }
+  },
   mounted() {
-    this.$socket.on('config:update', (data) => {
-      this.SET_CONFIG(data)
-    })
-    this.$socket.on('config:remove', (key) => {
-      this.SET_CONFIG({key, value: null})
-    })
+    // this.$socket.on('config:update', (data) => {
+    //   try{
+    //     data.value = JSON.parse(data.value);
+    //   } catch(e) {}
+    //   this.SET_CONFIG(data);
+    // })
+    // this.$socket.on('config:remove', (key) => {
+    //   this.SET_CONFIG({key, value: null})
+    // })
   },
   destroyed(){
-    this.$socket.off("config:update", update);
-    this.$socket.off("config:remove", remove);
+    //this.$socket.off("config:update", update);
+    //this.$socket.off("config:remove", remove);
   },
   methods : {
     ...mapMutations(['SET_CONFIG']),
     toggleDrawer(){
       this.drawer = !this.drawer;
-    }
+    },
   },
+  
 };
 </script>

@@ -11,6 +11,7 @@ import '@mdi/font/css/materialdesignicons.css'
 import './plugins';
 
 import titleMixin from './mixins/title-mixin';
+import socketMixin from './mixins/socket-mixin';
 
 
 Vue.config.productionTip = false
@@ -22,6 +23,7 @@ export function createApp(ctx){
   sync(store, router);
 
   Vue.mixin(titleMixin);
+  Vue.mixin(socketMixin);
 
   const app = new Vue({
     date : {url:ctx ? ctx.url : ''},
