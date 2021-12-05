@@ -3,6 +3,7 @@ import { createApp } from './main';
 // import "./plugin-client/vue-progressbar";
 // import "./plugin-client/ezNotify";
 import "./plugin-client";
+import plugins from './plugins';
 
 const { app, router, store } = createApp();
 
