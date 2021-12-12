@@ -6,7 +6,7 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
 	state: {
-		appReady : false,
+		appReady: false,
 		config: {
 			// title : "ezCode Home",
 			// footer: "ezCode all right reserved.",
@@ -65,16 +65,16 @@ const store = new Vuex.Store({
 		}
 	},
 	mutations: {
-		SET_APP_READY(state){
+		SET_APP_READY(state) {
 			state.appReady = true;
 		},
-		SET_CONFIG(state, {key, value}) {
+		SET_CONFIG(state, { key, value }) {
 
-			try{
-				value= JSON.parse(value);
-			}catch(e){}
+			try {
+				value = JSON.parse(value);
+			} catch (e) { }
 
-			if(state.config[key]){
+			if (state.config[key]) {
 				state.config[key] = value;
 			} else {
 				Vue.set(state.config, key, value);
@@ -82,24 +82,27 @@ const store = new Vuex.Store({
 		},
 	},
 	actions: {
-		async appInit({dispatch, commit}, ctx){
+		async appInit({ dispatch, commit }, ctx) {
 			// site 설정을 가지고 올꺼고
-			if(ctx){
+			if (ctx) {
 				const keys = Object.keys(ctx.config);
 				//console.log('appInit keys : ',keys)
-				for(const key of keys) {
-					commit('SET_CONFIG', {key, value: ctx.config[key]});
+				for (const key of keys) {
+					commit('SET_CONFIG', { key, value: ctx.config[key] });
 				}
 
 				commit('user/SET_MEMBER', ctx.member);
 				commit('user/SET_TOKEN', ctx.token);
-			}else{
+				if (ctx.member) {
+					commit('socket/ROOM_JOIN', ctx.member.mb_id);
+				}
+			} else {
 				await dispatch('configLoad');
 				await dispatch('user/initUser');
 			}
 			commit('SET_APP_READY');
 		},
-		async configDuplicateCheck(ctx, {field,value}) {
+		async configDuplicateCheck(ctx, { field, value }) {
 			const { $axios } = Vue.prototype;
 			const data = await $axios.get(`/api/config/duplicateCheck/${field}/${value}`);
 			//console.log('data',data );
@@ -111,14 +114,14 @@ const store = new Vuex.Store({
 			//console.log('data',data );
 			return data;
 		},
-		async configLoad({commit}) {
-			const {$axios} = Vue.prototype;
+		async configLoad({ commit }) {
+			const { $axios } = Vue.prototype;
 			const data = await $axios.get('/api/config');
 			//console.log('data : ', data);
 			const keys = Object.keys(data);
 
-			for(const key of keys) {
-				commit('SET_CONFIG', {key, value: data[key]});
+			for (const key of keys) {
+				commit('SET_CONFIG', { key, value: data[key] });
 			}
 		}
 	},
@@ -126,7 +129,7 @@ const store = new Vuex.Store({
 });
 
 export function createStore() {
-	
+
 	return store;
 }
 
