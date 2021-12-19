@@ -63,6 +63,7 @@
       persistent
     >
       <config-form
+        ref="configForm"
         @save="save"
         :keyCheck="keyCheck"
         :groupItems="groupItems"
@@ -131,15 +132,15 @@ export default {
     ...mapActions(["configDuplicateCheck", "configSave"]),
     addConfig() {
       this.item = null;
-      if (this.$refs.ConfigForm) {
-        this.$refs.ConfigForm.init();
+      if (this.$refs.configForm) {
+        this.$refs.configForm.init();
       }
       this.$refs.dialog.open();
     },
     updateConfig(item) {
       this.item = item;
-      if (this.$refs.ConfigForm) {
-        this.$refs.ConfigForm.init();
+      if (this.$refs.configForm) {
+        this.$refs.configForm.init();
       }
       this.$refs.dialog.open();
     },
@@ -155,7 +156,7 @@ export default {
       const data = await this.$axios.delete(`/api/config/${item.cf_key}`);
       // DB 목록 업데이트
       if (data) {
-        if (data.cf_client) {
+        if (item.cf_client) {
           this.$socket.emit("config:remove", item.cf_key);
         }
         this.$toast.info(`[${item.cf_name}] 삭제 하였습니다.`);
@@ -179,7 +180,7 @@ export default {
         // 수정
         this.$toast.info(`[${form.cf_name}] 수정 하였습니다.`);
         const idx = this.items.indexOf(this.item); // 인덱스 가져오기
-        console.log(idx);
+        //console.log(idx);
         this.items.splice(idx, 1, data);
       } else {
         // 신규
@@ -215,7 +216,7 @@ export default {
         // })
       });
       //console.log(arr);
-      this.$axios.put("/api/config", this.curItems);
+      this.$axios.put("/api/config", payload);
     },
     setCurItems() {
       this.curItems = this.items
@@ -232,16 +233,16 @@ export default {
       this.restart = true;
 
       //서버에 실제 요청
-      const data = await this.$axios("/api/config/restart");
+      const data = await this.$axios.get("/api/config/restart");
       if (data) {
         setTimeout(() => {
           if (this.restart) {
-            this.$toast.info(
+            this.$toast.error(
               "서버가 재시작 실패하였습니다.\n잠시 후 다시 시도 하세요."
             );
             this.restart = false;
           }
-          this.restart = false;
+          //this.restart = false;
         }, 20000);
       } else {
         this.restart = false;

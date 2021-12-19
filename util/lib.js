@@ -21,7 +21,7 @@ const lib = {
     getIp(req){
         return req.ip.replace('::ffff:', '')
     },
-    findParentWm(vm, target) {
+    findParentVm(vm, target) {
         let parent = vm.$parent;
         while(parent.$vnode) {
             if(parent.$vnode.tag.endsWith(target)){

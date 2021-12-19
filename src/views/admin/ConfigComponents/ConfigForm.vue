@@ -21,6 +21,7 @@
         </template>
         <span>클라이언트</span>
       </v-tooltip>
+      
       <input-duplicate-check
         ref="cfKey"
         label="키"
@@ -59,7 +60,7 @@ import InputDuplicateCheck from "../../../components/InputForms/InputDuplicateCh
 import TypeValue from "./TypeValue.vue";
 import { LV } from "../../../../util/level";
 import validateRules from "../../../../util/validateRules";
-import { deepCopy, findParentWm } from "../../../../util/lib";
+import { deepCopy, findParentVm } from "../../../../util/lib";
 import jsonStringify from "json-stable-stringify";
 
 export default {
@@ -109,7 +110,7 @@ export default {
         this.form = deepCopy(this.item);
         if (this.form.cf_type == "Json") {
           const obj = JSON.parse(this.form.cf_val);
-          this.form.cf_val = jsonStringify(obj, { space: "  " });
+          this.form.cf_val = jsonStringify(obj, {space : '  '});
         }
         this.orginKey = this.item.cf_key;
       } else {
@@ -137,7 +138,7 @@ export default {
       if (!this.$refs.cfKey.validate()) return;
       if (!this.item) {
         let i = 0;
-        const parent = findParentWm(this, "admConfig");
+        const parent = findParentVm(this, "admConfig");
         parent.items.forEach((item) => {
           if (item.cf_group == this.form.cf_group) {
             i++;

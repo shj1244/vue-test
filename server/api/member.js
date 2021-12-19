@@ -111,4 +111,9 @@ router.post('/checkPassword', async (req, res)=>{
     res.json(result)
 })
 
+router.get('/', async(req, res) => {
+    const result = await modelCall(memberModel.getMembers, req);
+    res.json(result)
+})
+
 module.exports = router;
