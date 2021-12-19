@@ -24,13 +24,13 @@
           </v-tab-item>
         </v-tabs-items>
       </v-card-text>
-      <v-card-text class="mt-n4">
+      <v-card-text class="mt-n4" v-if="config.useLoginGoogle">
         <v-btn @click="loginGoogle" block>구글 로그인</v-btn>
       </v-card-text>
-      <v-card-text class="mt-n4">
+      <v-card-text class="mt-n4" v-if="config.useLoginKakao">
         <v-btn @click="loginKakao" block>카카오 로그인</v-btn>
       </v-card-text>
-      <v-card-text class="mt-n4">
+      <v-card-text class="mt-n4" v-if="config.useLoginNaver">
         <v-btn @click="loginNaver" block>네이버 로그인</v-btn>
       </v-card-text>
       <v-card-text class="mt-n4">
@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import { mapActions, mapMutations } from "vuex";
+import { mapActions, mapState } from "vuex"
 import FindIdForm from '../../components/Auth/FindIdForm.vue';
 import FindPwForm from '../../components/Auth/FindPwForm.vue';
 import SignInForm from "../../components/Auth/SignInForm.vue";
@@ -56,6 +56,11 @@ export default {
       isLoading: false,
       dialog: false,
     };
+  },
+  computed: {
+    ...mapState({
+      config: (state) => state.config,
+    }),
   },
   methods: {
     ...mapActions('user', ['signInLocal','findIdLocal','findPwLocal', 'signInSocial']),
