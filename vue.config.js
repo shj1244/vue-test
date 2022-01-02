@@ -50,8 +50,8 @@ const cilentConfig = {
 
 //console.log(process.env);
 module.exports = {
-
 	devServer : {
+		overlay: false,
 		proxy: {
 			'/api' : {//proxy 포트 설정
  				target : `http://localhost:${process.env.VUE_APP_SERVER_PORT}` //개발서버dev 
