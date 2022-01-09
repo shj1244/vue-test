@@ -1,6 +1,14 @@
 <template>
   <v-form @submit.prevent="save" ref="form" v-model="valid" lazy-validation>
+    <v-text-field
+      v-if="!!form.mb_provider"
+      v-model="form.mb_provider"
+      label="소셜네트워크 제공자"
+      prepend-icon="mdi-account-network"
+      readonly
+    ></v-text-field>
     <input-duplicate-check
+      v-else
       ref="id"
       label="아이디"
       prepend-icon="mdi-account"
@@ -14,12 +22,12 @@
       prepend-icon="mdi-card-account-details-outline"
       :rules="rules.name()"
     />
-  <template v-if="!member.mb_provider">
+    <template v-if="!member.mb_provider">
       <input-password
         label="비밀번호"
         prepend-icon="mdi-lock"
         v-model="form.mb_password"
-        :rules="rules.password({required:false})"
+        :rules="rules.password({ required: false })"
       />
 
       <input-password
@@ -28,7 +36,7 @@
         v-model="confirmPw"
         :rules="[rules.matchValue(form.mb_password)]"
       />
-  </template>
+    </template>
     <input-duplicate-check
       ref="email"
       label="이메일"
@@ -39,6 +47,18 @@
       :readonly="!admMode"
       :origin="member.mb_email"
     />
+    <div v-if="admMode" class="mb-4">
+      <div class="pl-10">레벨 {{ form.mb_level }} : {{ lvLabel }}</div>
+      <v-slider
+        v-model="form.mb_level"
+        :min="LV.BLOCK"
+        :max="LV.SUPER"
+        ticks="always"
+        thumb-label
+        prepend-icon="mdi-chevron-triple-up"
+        hide-details
+      ></v-slider>
+    </div>
 
     <input-date
       v-model="form.mb_birth"
@@ -47,19 +67,16 @@
       :rules="rules.date({ label: '생년월일', required: !admMode })"
     />
     <div class="d-flex align-center">
-        <display-avatar :member="member"/>
-        <!-- accept="image/jpg" 허용할 이미지 확장자-->
-        <v-file-input 
-            class="ml-2"
-            label="회원이미지" 
-            v-model="form.mb_image" 
-            :prepend-icon="null"
-            accept="image/jpg,image/png,image/jpeg,image/bmp"
-        />
-        <v-checkbox
-          v-model="form.deleteImage"
-          label="삭제"
-        ></v-checkbox>
+      <display-avatar :member="member" />
+      <!-- accept="image/jpg" 허용할 이미지 확장자-->
+      <v-file-input
+        class="ml-2"
+        label="회원이미지"
+        v-model="form.mb_image"
+        :prepend-icon="null"
+        accept="image/jpg,image/png,image/jpeg,image/bmp"
+      />
+      <v-checkbox v-model="form.deleteImage" label="삭제"></v-checkbox>
     </div>
 
     <input-radio
@@ -74,7 +91,7 @@
       v-model="form.mb_phone"
       label="전화번호"
       prepend-icon="mdi-phone"
-      :rules="rules.phone({required: !admMode})"
+      :rules="rules.phone({ required: !admMode })"
     />
 
     <input-post
@@ -85,11 +102,29 @@
     />
 
     <v-btn type="submit" block color="primary" :loading="isLoading">
-      회원정보수정
+      회원수정
     </v-btn>
 
-    <v-btn block class="mt-4" color="error" :loading="isLoading" @click="$emit('onLeave')">
+    <v-btn
+      v-if="isType == 'member'"
+      block
+      class="mt-4"
+      color="error"
+      :loading="isLoading"
+      @click="$emit('onLeave')"
+    >
       회원탈퇴
+    </v-btn>
+
+    <v-btn
+      v-else
+      block
+      class="mt-4"
+      color="error"
+      :loading="isLoading"
+      @click="$emit('onRestore')"
+    >
+      회원복원
     </v-btn>
 
   </v-form>
@@ -103,8 +138,9 @@ import InputDate from "../InputForms/inputDate.vue";
 import InputRadio from "../InputForms/inputRadio.vue";
 import InputPhone from "../InputForms/inputPhone.vue";
 import InputPost from "../InputForms/inputPost.vue";
-import {deepCopy} from "../../../util/lib";
-import DisplayAvatar from '../layout/DisplayAvatar.vue';
+import { deepCopy } from "../../../util/lib";
+import DisplayAvatar from "../layout/DisplayAvatar.vue";
+import { LV, LV_LABEL, LV_COLOR } from "../../../util/level";
 
 export default {
   components: {
@@ -118,13 +154,13 @@ export default {
   },
   name: "UserUpdateForm",
   props: {
-    admMode : {
-        type : Boolean,
-        default : false,
+    admMode: {
+      type: Boolean,
+      default: false,
     },
-    member : {
-        type : Object,
-        required : true,
+    member: {
+      type: Object,
+      required: true,
     },
     isLoading: {
       type: Boolean,
@@ -134,11 +170,15 @@ export default {
       type: Function,
       default: null,
     },
+    isType: {
+      tyep: String,
+      default: 'member'
+    }
   },
   data() {
     return {
       valid: true,
-      form: null, /* {
+      form: null /* {
         mb_id: "testx",
         mb_password: "abcd1234",
         mb_name: "테스트",
@@ -151,7 +191,7 @@ export default {
           "서울 중구 삼일대로 343 (저동1가, 대신파이낸스센터(Daishin Finance Center))",
         mb_addr2: "21층 it개발부",
         mb_image : null, //폼의 이미지는 객체가 아닌 폼객체를 따로 만들어서 이미지를 첨부해서 보낸다.
-      }, */
+      }, */,
       genderItems: [
         { label: "남자", value: "M" },
         { label: "여자", value: "F" },
@@ -161,21 +201,26 @@ export default {
   },
   computed: {
     rules: () => validateRules,
+    LV: () => LV,
+    LV_COLOR: () => LV_COLOR,
+    lvLabel() {
+      return LV_LABEL(this.form.mb_level);
+    },
   },
   created() {
-      this.form = deepCopy(this.member);
-      this.form.mb_password= "",
-      this.form.admMode= this.admMode;
-      this.form.deleteImage=false // true 이면 기존이미지 삭제
-      delete this.form.mb_create_at;
-      delete this.form.mb_create_ip;
-      delete this.form.mb_leave_at;
-      delete this.form.mb_leave_ip;
-      delete this.form.mb_update_at;
-      delete this.form.mb_update_ip;
-      delete this.form.mb_login_at;
-      delete this.form.mb_login_ip;
-      delete this.form.mb_leave_at;
+    this.form = deepCopy(this.member);
+    this.form.mb_password = "";
+    this.form.admMode = this.admMode;
+    this.form.deleteImage = false; // true 이면 기존이미지 삭제
+    delete this.form.mb_create_at;
+    delete this.form.mb_create_ip;
+    delete this.form.mb_leave_at;
+    delete this.form.mb_leave_ip;
+    delete this.form.mb_update_at;
+    delete this.form.mb_update_ip;
+    delete this.form.mb_login_at;
+    delete this.form.mb_login_ip;
+    delete this.form.mb_leave_at;
   },
   methods: {
     async save() {
@@ -189,7 +234,7 @@ export default {
       //console.log(this.form);
       const formData = new FormData();
       const keys = Object.keys(this.form);
-      for(const key of keys){
+      for (const key of keys) {
         formData.append(key, this.form[key]);
       }
       //formData.append('mb_image', this.mb_image);
