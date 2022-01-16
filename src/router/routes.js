@@ -32,12 +32,17 @@ const routes = [
     {
       path: '/adm/config',
       name: 'AdmConfig',
-      component: () => import(/* webpackChunkName: "AdmConfig" */ '../views/admin/Config.vue')
+      component: () => import(/* webpackChunkName: "admConfig" */ '../views/admin/Config.vue')
     },
     {
       path: '/adm/member',
       name: 'AdmMember',
-      component: () => import(/* webpackChunkName: "AdmMember" */ '../views/admin/Member.vue')
+      component: () => import(/* webpackChunkName: "admMember" */ '../views/admin/Member.vue')
+    },
+    {
+      path: '/adm/menu',
+      name: 'AdmMenu',
+      component: () => import(/* webpackChunkName: "admMenu" */ '../views/admin/Menu.vue')
     },
     {
       path: '*',

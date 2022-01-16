@@ -5,12 +5,12 @@
         v-on="on"
         v-bind="attrs"
         size="20"
-        :color="LV_COLOR(member.mb_level)"
+        :color="LV_COLOR(level)"
       >
-        <span style="color: #121212">{{ member.mb_level }}</span>
+        <span style="color: #121212">{{ level }}</span>
       </v-avatar>
     </template>
-    <span>{{ LV_LABEL(member.mb_level) }}</span>
+    <span>{{ LV_LABEL(level) }}</span>
   </v-tooltip>
 </template>
 
@@ -20,8 +20,8 @@ import { LV_LABEL, LV_COLOR } from "../../../util/level";
 export default {
   name: "DisplayLevel",
   props: {
-    member: {
-      type: Object,
+    level: {
+      type: [String, Number],
       required: true,
     },
   },

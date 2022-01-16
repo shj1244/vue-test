@@ -10,7 +10,6 @@
 </template>
 
 <script>
-import { LV_LABEL, LV_COLOR } from "../../../util/level";
 
 export default {
   name: "DisplayTime",
