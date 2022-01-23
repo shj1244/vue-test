@@ -22,6 +22,12 @@ export const getters = {
     },
     isAdmin(state) {
         return state.member && state.member.mb_level >= LV.ADMIN;
+    },
+    GRANT(state){
+        if(state.member){
+            return state.member.mb_level;
+        }
+        return LV.BLOCK;
     }
 };
 
