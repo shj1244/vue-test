@@ -78,10 +78,14 @@ export default {
     },
     isShow(item) {
       const { disabled } = this.isDisabled(item);
-      if (disabled) {
+      console.log("item.title===>",item.title)
+      if(item.isHide){ // 아이템 개별 숨김이 참이면 
+        return false;
+      }
+      if (disabled) { // 전체 설정이 참이면 
         return !this.menuHide;
       } else {
-        return false;
+        return true;
       }
     },
   },

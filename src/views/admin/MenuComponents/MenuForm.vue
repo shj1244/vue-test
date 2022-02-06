@@ -24,6 +24,7 @@
     <v-text-field label="링크" v-model="form.to" />
     <input-level label="접근권한" v-model="form.grant" />
     <v-checkbox label="새창에서 열기" v-model="form.newTab" />
+    <v-checkbox label="메뉴 숨김 열기" v-model="form.isHide" />
     <v-btn block type="submit" color="primary">저장</v-btn>
   </v-form>
 </template>
@@ -70,6 +71,7 @@ export default {
           subItems: [],
           title: "",
           to: "",
+          isHide : false,
         };
       }
       console.log("menuForm==>", this.form);
