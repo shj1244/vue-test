@@ -20,8 +20,8 @@ export const getters = {
     isAdmin(state) {
         return state.member && state.member.mb_level >= LV.ADMIN;
     },
-    isAdmin(state) {
-        return state.member && state.member.mb_level >= LV.ADMIN;
+    isSuper(state) {
+        return state.member && state.member.mb_level >= LV.SUPER;
     },
     GRANT(state){
         if(state.member){
