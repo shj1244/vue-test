@@ -48,7 +48,6 @@ export default {
     methods: {
         initMenu(){
             const items = deepCopy(this.menu);
-            console.log("items===>",items)
             this.findActiveItem(items, null);
             this.items = items;
         },

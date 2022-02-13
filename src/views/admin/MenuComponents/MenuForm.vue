@@ -74,7 +74,7 @@ export default {
           isHide : false,
         };
       }
-      console.log("menuForm==>", this.form);
+      //console.log("menuForm==>", this.form);
     },
     async save(){
         this.$refs.form.validate();

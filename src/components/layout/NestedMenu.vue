@@ -78,7 +78,7 @@ export default {
     },
     isShow(item) {
       const { disabled } = this.isDisabled(item);
-      console.log("item.title===>",item.title)
+      //console.log("item.title===>",item.title)
       if(item.isHide){ // 아이템 개별 숨김이 참이면 
         return false;
       }
