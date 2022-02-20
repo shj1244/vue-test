@@ -11,7 +11,7 @@
       ticks="always"
       tick-size="1"
       thumb-label
-      @inut="$emit('input', $event)"
+      @input="$emit('input', $event)"
     ></v-slider>
   </div>
 </template>
