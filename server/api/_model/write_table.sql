@@ -1,0 +1,42 @@
+CREATE TABLE write_{{table}} (
+    wr_id int(11) unsigned auto_increment,
+    wr_reply int(11) unsigned NOT NULL default '0',
+    wr_grp int(11) unsigned NOT NULL default '0',
+    wr_order int(11) unsigned NOT NULL default '0',
+    wr_dep tinyint unsigned NOT NULL default '0',
+    wr_parent int(11) unsigned NOT NULL default '0',
+    mb_id varchar(191) NOT NULL default '',
+    wr_email varchar(191) NOT NULL default '',
+    wr_name varchar(191) NOT NULL default '',
+    wr_password varchar(191) NOT NULL default '',
+    wr_category varchar(191) NOT NULL default '',
+    wr_title varchar(191) NOT NULL default '',
+    wr_content text not null,
+    wr_summary text not null,
+    wr_view int(11) unsigned NOT NULL default '0',
+    wr_ip varchar(20) not null,
+    wr_createat datetime not null,
+    wr_updateat datetime not null,
+    wr_1 varchar(191) not null default '',
+    wr_2 varchar(191) not null default '',
+    wr_3 varchar(191) not null default '',
+    wr_4 varchar(191) not null default '',
+    wr_5 varchar(191) not null default '',
+    wr_6 varchar(191) not null default '',
+    wr_7 varchar(191) not null default '',
+    wr_8 varchar(191) not null default '',
+    wr_9 varchar(191) not null default '',
+    wr_10 varchar(191) not null default '',
+    primary key(wr_id),
+    index(wr_reply,wr_grp ,wr_order,wr_parent)
+);
+
+CREATE VIEW view_{{table}} as
+SELECT wr_id, wr_reply, wr_grp, wr_order,wr_dep,wr_parent,
+    mb_id,wr_email,wr_name,wr_password,wr_category,
+    wr_title,wr_content,wr_summary,wr_view,wr_ip,wr_createat,wr_updateat,
+    wr_1,wr_2,wr_3,wr_4,wr_5,wr_6,wr_7,wr_8,wr_9,wr_10,
+    (select count(*) from board_good where bo_table='{{table}}' and wr_id=w.wr_id and bg_flag=1) as good,
+    (select count(*) from board_good where bo_table='{{table}}' and wr_id=w.wr_id and bg_flag=2) as bad,
+    (select count(*) from write_{{table}} where wr_reply=w.wr_id)as replys
+from write_{{table}} AS w;

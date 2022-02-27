@@ -12,17 +12,17 @@
         v-model="form.bo_table"
         counter="30"
         :readonly="!!table"
-        :rules="[rules.alphaNum(), rules.require({label:'게시판 ID'})]"
+        :rules="[rules.alphaNum(), rules.require({ label: '게시판 ID' })]"
       />
       <v-text-field
         label="게시판 제목"
         v-model="form.bo_subject"
         counter="100"
-        :rules="[rules.require({label:'게시판 제목'})]"
+        :rules="[rules.require({ label: '게시판 제목' })]"
       />
       <v-select label="게시판 스킨" v-model="form.bo_skin" :items="skins" />
       <!-- 게시판 정렬 규칙 -->
-      <board-sort :items="form.bo_sort"/>
+      <board-sort :items="form.bo_sort" />
 
       <div class="d-flex">
         <v-switch label="카테고리 사용" v-model="form.bo_use_category" inset />
@@ -118,7 +118,7 @@
         </v-expansion-panel>
       </v-expansion-panels>
     </v-form>
-    <v-toolbar class="mt-4">      
+    <v-toolbar class="mt-4">
       <v-btn label="목록" to="/adm/board/list" color="accent">목록</v-btn>
       <v-spacer></v-spacer>
       <v-btn color="primary" class="ml-2" @click="save">{{ btnLabel }}</v-btn>
@@ -130,7 +130,7 @@
 import { LV } from "../../../../util/level";
 import TooltipBtn from "../../../components/etc/TooltipBtn.vue";
 import BoardSlider from "./Components/BoardSlider.vue";
-import BoardSort from './Components/BoardSort.vue';
+import BoardSort from "./Components/BoardSort.vue";
 import validateRules from "../../../../util/validateRules";
 
 export default {
@@ -151,7 +151,7 @@ export default {
   },
   computed: {
     pageTitle() {
-      return this.table ? `${this.table}"게시물 수정` : `게시물 생성`;
+      return this.table ? `${this.table} 게시물 수정` : `게시물 생성`;
     },
     btnLabel() {
       return this.table ? "수정" : "생성";
@@ -163,9 +163,14 @@ export default {
     this.fetchSkinList();
   },
   methods: {
-    init() {
+    async init() {
       if (this.table) {
         // 수정 : 게시물 정보를 가지고 와서 넣어주자
+        const data = await this.$axios.get(`/api/adm/board/${this.table}`);
+        data.bo_category = JSON.parse(data.bo_category);
+        data.bo_sort = JSON.parse(data.bo_sort);
+        data.wr_fields = JSON.parse(data.wr_fields);
+        this.form = data;
       } else {
         // 신규
         const form = {
@@ -195,16 +200,32 @@ export default {
         this.form = form;
       }
     },
-    async fetchSkinList(){
-      const data = await this.$axios.get('/api/adm/board/skinList');
+    async fetchSkinList() {
+      const data = await this.$axios.get("/api/adm/board/skinList");
       this.skins = data;
     },
-    async save(){
-        this.$refs.form.validate();
-        await this.$nextTick();
-        if (!this.valid) return;
-        console.log("boardfrom save===>",this.form);
-    }
+    async save() {
+      this.$refs.form.validate();
+      await this.$nextTick();
+      if (!this.valid) return;
+      //console.log("boardfrom save===>",this.form);
+      // 수정이면
+      let data = false;
+
+      if (this.table) { // 수정
+        data = await this.$axios.put(`/api/adm/board/${this.table}`, this.form);
+      } else { // 생성
+        // 서버로 데이타를 보내서 게시판 생성
+        data = await this.$axios.post("/api/adm/board", this.form);
+      }
+
+      if (data) {
+        this.$toast.info(
+          `${this.form.bo_subject} 게시판을 ${this.btnLabel}생성하였습니다.`
+        );
+        this.$router.push("/adm/board/list");
+      }
+    },
   },
 };
 </script>

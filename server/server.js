@@ -62,6 +62,7 @@ app.use(cookieParser());
 global.MEMBER_PHOTO_PATH = path.join(__dirname, './upload/memberPhoto');
 // MEMBER_PHOTO_PATH 폴더가 없으면 파일폴더를 생성 - 서버에 따로 폴더를 생성하지 않아도 됨.
 fs.mkdirSync(MEMBER_PHOTO_PATH, {recursive: true});
+global.UPLOAD_PATH = path.join(__dirname, './upload');
 
 //passport
 const passport = require('./plugins/passport');

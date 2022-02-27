@@ -438,7 +438,7 @@ const memberModel = {
         items.forEach(item => {
             clearMemberField(item);
         });
-        return { items, totalItems, sql, options };
+        return { items, totalItems };
 
     }
 }
