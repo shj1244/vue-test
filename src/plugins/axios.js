@@ -14,9 +14,9 @@ import VueCookies from "vue-cookies";
 let config = {
   baseURL: process.env.BASE_URL || process.env.apiUrl || "",
   timeout: 60 * 1000, // Timeout
-  Proxy : {
+  proxy : {
     host: "localhost",
-    prot : process.env.VUE_APP_SERVER_PORT
+    port : process.env.VUE_APP_SERVER_PORT
   }
 };
 

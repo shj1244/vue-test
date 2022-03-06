@@ -4,10 +4,10 @@ import modules from './modules';
 
 Vue.use(Vuex)
 
-function menuAccess(ref, arr){
-	arr.forEach(el=>{
+function menuAccess(ref, arr) {
+	arr.forEach(el => {
 		ref[el.to] = el.grant;
-		if(el.subItems && el.subItems.length){
+		if (el.subItems && el.subItems.length) {
 			menuAccess(ref, el.subItems);
 		}
 	})
@@ -71,7 +71,9 @@ const store = new Vuex.Store({
 			// 		subItems : []
 			// 	}
 			// ],
-		}
+		},
+		initFetchs: [],
+		initData : null,
 	},
 	mutations: {
 		SET_APP_READY(state) {
@@ -89,14 +91,31 @@ const store = new Vuex.Store({
 				Vue.set(state.config, key, value);
 			}
 		},
+		PUSH_FETCH(state, tag){
+			state.initFetchs.push(tag);
+		},
+		SET_INITDATA(state, data){
+			if(data == null){
+				this.initFetchs = null;
+				this.initData = null;
+			}else{
+				const keys = Object.keys(data);
+				if(state.initData == null){
+					state.initData = {};
+				}
+				for(const key of keys){
+					state.initData[key] = data[key];
+				}
+			}
+		}
 	},
-	getters : {
-		access(state){
+	getters: {
+		access(state) {
 			const obj = {};
-			if(state.config.menu){
+			if (state.config.menu) {
 				menuAccess(obj, state.config.menu);
 			}
-			console.log(obj);
+			//console.log(obj);
 			return obj;
 		}
 	},

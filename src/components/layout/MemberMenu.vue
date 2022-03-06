@@ -51,7 +51,7 @@ export default {
     return {
       "member:admUpdate": async (newMember) => {
         let msg = "";
-        console.log(this.member.mb_level, newMember.mb_level);
+        //console.log(this.member.mb_level, newMember.mb_level);
         //console.log(newMember);
         if (this.member.mb_level != newMember.mb_level) {
           if (newMember.mb_level < LV.MEMBER) {

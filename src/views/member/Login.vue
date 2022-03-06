@@ -124,7 +124,7 @@ export default {
       this.socialPopup("/api/member/loginNaver");
     },
     socialCallback(payload){
-      console.log("Callback payload===>",payload);
+      //console.log("Callback payload===>",payload);
       if(payload.err){
         this.$toast.error(payload.err);
       } else {
