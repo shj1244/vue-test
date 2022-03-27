@@ -223,7 +223,7 @@ export default {
       const data = await this.$axios.post(`/api/board/write/${this.table}`,formData);
       return data.wr_id;
     },
-    async update(formData) {},
+    async update(formData) {}, 
   },
 };
 </script>
