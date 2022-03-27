@@ -185,7 +185,7 @@ export default {
       const keys = Object.keys(this.form);
 
       for (const key of keys) {
-        if (typeof this.form[key] === "Object") {
+        if (typeof this.form[key] === "object") {
           formData.append(key, JSON.stringify(this.form[key]));
         } else {
           formData.append(key, this.form[key]);
@@ -200,6 +200,9 @@ export default {
         }
       }
 
+      // 에디터에서 업로드한 이미지
+      formData.append('upImages', JSON.stringify(this.upImages));
+
       let wr_id; // 게시물 id
       if (this.id) {
         // TODO : 수정
@@ -211,11 +214,15 @@ export default {
 
       if(wr_id){
         this.isWrite = true;
+        this.$router.push(`/board/${this.table}/${wr_id}`);
       }
 
       this.loading = false;
     },
-    async insert(formData) {},
+    async insert(formData) {
+      const data = await this.$axios.post(`/api/board/write/${this.table}`,formData);
+      return data.wr_id;
+    },
     async update(formData) {},
   },
 };

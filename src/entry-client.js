@@ -21,6 +21,7 @@ function addStyle(href) {
 
 }
 addStyle('/css/style.css');
+addStyle('/css/ez-tiptap.min.css');
 
 router.onReady(() => {
 	//console.log('entry-client.js onReady');

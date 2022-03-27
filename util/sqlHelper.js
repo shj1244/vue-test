@@ -87,7 +87,7 @@ const sqlHelper = {
             }
         }
 
-        if(whereArr.length){
+        if (whereArr.length) {
             where = ` WHERE ` + whereArr.join(' AND ');
         }
 
@@ -138,6 +138,24 @@ const sqlHelper = {
         query = query.replace('{1}', keys.join(', '));
         query = query.replace('{2}', prepare);
         return { query, values }
+    },
+    InsertArray(table, datas) {
+        let sql;
+        let prepare; // (?,?,?)
+        for (const i in datas) {
+            const data = datas[i];
+            const keys = Object.keys(data);
+            if (i == 0) {
+                sql = sqlHelper.Insert(table, data);
+                prepare = new Array(keys.length).fill('?').join(', ');
+            } else {
+                sql.query += `, (${prepare})`;
+                for(const key of keys){
+                    sql.values.push(data[key]);
+                }
+            }
+        }
+        return sql;
     },
     Update(table, data, where) {
         let query = `UPDATE ${table} SET {1} WHERE {2}`;
