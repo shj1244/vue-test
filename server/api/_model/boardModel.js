@@ -145,7 +145,7 @@ const boardModel = {
         return { wr_id };
 
     },
-    async writeUpdate(bo_table, wr_id, data, files){
+    async writeUpdate(bo_table, wr_id, data, files) {
         //console.log("writeupdate===>");
         const table = `${TABLE.WRITE}${bo_table}`;
         delete data.wr_id;
@@ -155,8 +155,8 @@ const boardModel = {
         delete data.wrFiles;
 
         // 기존 첨부파일에서 삭제가 침인거
-        for(const wrFile of wrFiles){
-            if(wrFile.remove){
+        for (const wrFile of wrFiles) {
+            if (wrFile.remove) {
                 await boardModel.removeFile(bo_table, wrFile); // 파일 삭제
             }
         }
@@ -191,9 +191,9 @@ const boardModel = {
         delete data.wrTags;
         await tagModel.registerTags(bo_table, wr_id, wrTags);
 
-        const sql = sqlHelper.Update(table, data, {wr_id});
+        const sql = sqlHelper.Update(table, data, { wr_id });
         const [rows] = await db.execute(sql.query, sql.values);
-        return {wr_id};
+        return { wr_id };
     },
     async clearImages(bo_table, wr_id, wr_content, upImages) {
         for (const img of upImages) {
@@ -207,12 +207,21 @@ const boardModel = {
     },
     async getList(bo_table, config, options, member) {
         const table = `${TABLE.VIEW}${bo_table}`;
+
+        options.sortBy  = [];
+        options.sortDesc = [];
+        for (const sort of config.bo_sort) {
+            options.sortBy.push(sort.by);
+            options.sortDesc.push(sort.desc == 1);
+        }
+
+
         //getList===>",table);
         //console.log("getList options===>",options);
 
         const sql = sqlHelper.SelectLimit(table, options);
-        const [[{ totalItems }]] = await db.execute(sql.countQuery, sql.values);
         const [items] = await db.execute(sql.query, sql.values);
+        const [[{ totalItems }]] = await db.execute(sql.countQuery, sql.values);
 
         return { items, totalItems };
     },
@@ -244,15 +253,15 @@ const boardModel = {
         const [rows] = await db.execute(sql.query, sql.values);
         const wrImgs = []; // 본문에 첨부된 이미지 목록
         const wrFiles = []; // 첨부파일
-        for(const row of rows){
-            if(wr_content.indexOf(row.bf_src) > -1) { // 본문에 경로가 있으면
+        for (const row of rows) {
+            if (wr_content.indexOf(row.bf_src) > -1) { // 본문에 경로가 있으면
                 wrImgs.push(row);
-            }else{ // 없으니까 첨부파일
+            } else { // 없으니까 첨부파일
                 row.remove = false; // 수정할때 첨부파일 삭제 여부
                 wrFiles.push(row);
             }
         }
-        return {wrImgs, wrFiles}
+        return { wrImgs, wrFiles }
     },
 
 };

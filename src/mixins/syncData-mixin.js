@@ -13,7 +13,7 @@ const serverMixin = {
                 return;
             }
             this.PUSH_FETCH(this.$vnode.tag);
-            //console.log("initFetchs===>", this.initFetchs);
+            console.log("initFetchs===>", this.initFetchs);
             return syncData.call(this);
         }
     },
