@@ -23,6 +23,12 @@
           plain
           class="justify-start pl-0"
         >
+          <v-icon
+            v-if="item.wr_dep > 0"
+            :style="{'padding-left': `${(item.wr_dep - 1) * 16}px`}"
+          >
+          mdi-subdirectory-arrow-right
+          </v-icon>
           <div>{{ item.wr_title }}</div>
         </v-btn>
       </template>
@@ -75,6 +81,11 @@ export default {
           searchable: false,
           width: "60",
         },
+        // { text: "ID", value : 'wr_id' },
+        // { text: "GRP", value : 'wr_grp' },
+        // { text: "ORD", value : 'wr_order' },
+        // { text: "DEP", value : 'wr_dep' },
+        // { text: "PR", value : 'wr_parent' },
         {
           text: "제목",
           value: "wr_title",

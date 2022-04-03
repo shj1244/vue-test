@@ -12,8 +12,11 @@ const { getSummary } = require('../../../util/lib');
 
 const boardModel = {
     async getConfig(bo_table) {
+        //console.log("board.js boardmodel bo_table==>",bo_table);
         const sql = sqlHelper.SelectSimple(TABLE.BOARD, { bo_table });
+        //console.log("board.js boardmodel sql==>",sql);
         const [[row]] = await db.execute(sql.query, sql.values);
+        //console.log("board.js boardmodel row==>",row);
         if (!row) {
             throw new Error(`${bo_table} 게시판이 없습니다.`);
         }
@@ -98,7 +101,16 @@ const boardModel = {
             data.wr_order = 0;
             data.wr_dep = 0;
         } else { // 답글
-
+            const grpQuery = `SELECT wr_grp, wr_order, wr_dep FROM ${table} WHERE wr_id=${data.wr_parent}`;
+            const [[parent]] = await db.execute(grpQuery);
+            data.wr_grp = parent.wr_grp;
+            data.wr_order = parent.wr_order + 1;
+            data.wr_dep = parent.wr_dep + 1;
+            const uSql = `UPDATE ${table} SET wr_order=wr_order+1 
+                          WHERE wr_reply = ${data.wr_reply} 
+                          AND wr_grp = ${parent.wr_grp}
+                          AND wr_order >= ${data.wr_order}`
+            await db.execute(uSql);
         }
 
         // 게시판 작성일
@@ -132,6 +144,56 @@ const boardModel = {
         await boardModel.clearImages(bo_table, wr_id, data.wr_content, upImages);
         return { wr_id };
 
+    },
+    async writeUpdate(bo_table, wr_id, data, files){
+        //console.log("writeupdate===>");
+        const table = `${TABLE.WRITE}${bo_table}`;
+        delete data.wr_id;
+
+        // 기존 첨부파일
+        const wrFiles = JSON.parse(data.wrFiles);
+        delete data.wrFiles;
+
+        // 기존 첨부파일에서 삭제가 침인거
+        for(const wrFile of wrFiles){
+            if(wrFile.remove){
+                await boardModel.removeFile(bo_table, wrFile); // 파일 삭제
+            }
+        }
+
+        // 새로운 첨부 파일 등록
+        if (files) {
+            const keys = Object.keys(files);
+            for (const key of keys) {
+                const file = files[key];
+                await boardModel.uploadFile(bo_table, "", file, wr_id);
+            }
+        }
+
+        // 에디터에서 업로드한 이미지 처리
+        const upImages = JSON.parse(data.upImages).concat(JSON.parse(data.wrImgs));
+        delete data.upImages;
+        delete data.wrImgs;
+        await boardModel.clearImages(bo_table, wr_id, data.wr_content, upImages);
+
+        // 데이터 정리
+        delete data.wr_createat; // 생성일 삭제
+        delete data.wr_password; // 비밀번호 삭제
+        data.wr_updateat = moment().format('LT'); // 수정일 수정
+        data.wr_summary = getSummary(data.wr_content, 250); // 내용 수정
+        delete data.good; // 좋아요 삭제
+        delete data.bad; // 싫어요 삭제
+        delete data.replys; // 댓글 삭제
+        delete data.goodFlag; //  삭제
+
+        // 태그
+        const wrTags = JSON.parse(data.wrTags);
+        delete data.wrTags;
+        await tagModel.registerTags(bo_table, wr_id, wrTags);
+
+        const sql = sqlHelper.Update(table, data, {wr_id});
+        const [rows] = await db.execute(sql.query, sql.values);
+        return {wr_id};
     },
     async clearImages(bo_table, wr_id, wr_content, upImages) {
         for (const img of upImages) {
