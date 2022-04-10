@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapMutations, mapState } from "vuex";
+import { mapGetters, mapMutations, mapState } from "vuex";
 import { LV } from "../../../../../util/level";
 import SsrRenderer from "../../../../components/util/SsrRenderer.vue";
 
@@ -60,13 +60,13 @@ export default {
   },
   data() {
     return {
-      // item: null,
+      item: null,
     };
   },
   computed: {
     ...mapState({
       member: (state) => state.user.member,
-      item: (state) => state.board.read,
+      initData: (state) => state.initData,
     }),
     ...mapGetters("user", ["GRANT"]),
 
@@ -86,31 +86,33 @@ export default {
       return "";
     },
   },
-  watch: {
-    id() {
-      this.fetchData();
-    },
-  },
-  serverPrefetch() {
-    if (!this.item) {
+  syncData() {
+    if (this.initData && this.initData.read) {
+      return this.setData(this.initData.read);
+    } else {
       return this.fetchData();
     }
   },
-  mounted() {
-    this.fetchData();
-  },
+
   methods: {
-    ...mapActions("board", ["getBoardRead"]),
+    ...mapMutations(["SET_INIDATA"]),
     async fetchData() {
       const headers = {};
       if (this.$ssrContext) {
         headers.token = this.$ssrContext.token;
       }
-      await this.getBoardRead({
-        table: this.table,
-        id: this.id,
-        headers,
-      });
+      const data = await this.$axios.get(
+        `/api/board/read/${this.table}/${this.id}`,
+        { headers }
+      );
+      if (this.$ssrContext) {
+        //console.log("list ", data);
+        this.SET_INITDATA({ read: data });
+      }
+      this.setData(data);
+    },
+    setData(data) {
+      this.item = data;
     },
   },
 };

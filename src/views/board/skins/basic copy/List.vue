@@ -2,11 +2,6 @@
   <v-container>
     <v-toolbar>
       <v-toolbar-title>{{ pageTitle }} </v-toolbar-title>
-      <v-sheet v-if="config.bo_use_category == 1" width="150" class="ml-4">
-        <cate-select :options.sync="options" />
-      </v-sheet>
-      <search-field :items="searchItems" :options.sync="options" />
-
       <v-spacer />
       <v-btn :to="`/board/${table}?act=write`" color="primary">
         <v-icon left>mdi-pencil</v-icon>
@@ -44,12 +39,8 @@
 <script>
 import qs from "qs";
 import { deepCopy } from "../../../../../util/lib";
-import { mapActions, mapMutations, mapState } from "vuex";
-import SearchField from "../../../../components/layout/SearchField.vue";
-import CateSelect from "../basic/component/CateSelect.vue";
-
+import { mapMutations, mapState } from "vuex";
 export default {
-  components: { SearchField, CateSelect },
   name: "BasicList",
   props: {
     config: Object,
@@ -61,21 +52,28 @@ export default {
   data() {
     return {
       loading: false,
-      options: {},
-      pageRouting: false,
-      pageReady: false,
+      items: [],
+      totalItems: 0,
+      options: {
+        itemsPerPage: 10,
+        page: 1,
+        //sortBy: ["wr_grp","wr_order"],
+        //sortDesc: [false, true],
+        stf: [""],
+        stc: [""],
+        stx: [""],
+      },
     };
   },
   computed: {
     ...mapState({
-      items: (state) => state.board.list,
-      totalItems: (state) => state.board.totalItems,
+      initData: (state) => state.initData,
     }),
     table() {
       return this.config.bo_table;
     },
     pageTitle() {
-      return this.config.bo_subject + " 게시판";
+      return this.config.bo_subject + " 게시물";
     },
     headers() {
       const headers = [
@@ -111,14 +109,14 @@ export default {
           value: "wr_createat",
           align: "center",
           sortable: false,
-          searchable: false,
+          searchable: true,
         },
         {
           text: "조회수",
           value: "wr_view",
           align: "center",
           sortable: false,
-          searchable: false,
+          searchable: true,
         },
       ];
       if (this.config.bo_use_category) {
@@ -132,15 +130,6 @@ export default {
       }
       return headers;
     },
-    searchItems() {
-      const arr = this.headers.filter((item) => item.searchable); // 제목과 내용은 가져오고
-      arr.push({
-        // 검색할 내용 추가
-        text: "내용",
-        value: "wr_content",
-      });
-      return arr;
-    },
   },
   watch: {
     options: {
@@ -149,58 +138,16 @@ export default {
       },
       deep: true,
     },
-    table() {
-      this.fetchData();
-    },
   },
-  serverPrefetch() {
-    return this.fetchData();
-  },
-  created() {
-    this.options = this.initOptions();
-  },
-  mounted() {
-    window.addEventListener("popstate", this.routeChange);
-  },
-  destroyed() {
-    window.removeEventListener("popstate", this.routeChange);
+  syncData() {
+    if (this.initData && this.initData.list) {
+      return this.setData(this.initData.list);
+    } else {
+      return this.fetchData();
+    }
   },
   methods: {
-    ...mapActions("board", ["getBoardList"]),
-    initOptions() {
-      const { query } = this.$route;
-      const options = {
-        page: Number(query.page) || 1,
-        itemsPerPage: Number(query.itemsPerPage) || 10,
-        stf: [query.stf || "", "wr_category"],
-        stx: [query.stx || "", ""],
-        stc: [query.stc || "", "eq"],
-      };
-      return options;
-    },
-    pushState() {
-      //console.log("페이지 라우팅", this.pageRouting);
-      if (!this.pageRouting) {
-        const opt = {
-          page: this.options.page,
-          itemsPerPage: this.options.itemsPerPage,
-          stf: this.options.stf[0] || undefined,
-          stx: this.options.stx[0] || undefined,
-          stc: this.options.stc[0] || undefined,
-          ca: this.options.stx[1] || undefined,
-        };
-        const query = qs.stringify(opt);
-        if (this.pageReady) {
-          history.pushState(null, null, `${this.$route.path}?${query}`);
-        } else {
-          history.replaceState(null, null, `${this.$route.path}?${query}`);
-        }
-      }
-    },
-    routeChange() {
-      this.pageRouting = true;
-      this.options = this.initOptions();
-    },
+    ...mapMutations(["SET_INITDATA"]),
     getPayload() {
       const payload = deepCopy(this.options);
 
@@ -221,12 +168,26 @@ export default {
     async fetchData() {
       const payload = this.getPayload();
       const query = qs.stringify(payload);
+
       const headers = {};
       if (this.$ssrContext) {
         headers.token = this.$ssrContext.token;
       }
 
-      await this.getBoardList({ vm: this, query, headers });
+      const data = await this.$axios.get(
+        `/api/board/list/${this.table}?${query}`,
+        { headers }
+      );
+
+      if (this.$ssrContext) {
+        //console.log("list ", data);
+        this.SET_INITDATA({ list: data });
+      }
+      this.setData(data);
+    },
+    setData(data) {
+      this.items = data.items;
+      this.totalItems = data.totalItems;
     },
   },
 };
