@@ -1,3 +1,4 @@
+const fs = require('fs');
 const router = require('express').Router();
 const { isGrant, LV } = require('../../util/level');
 const { modelCall, getIp } = require('../../util/lib');
@@ -105,5 +106,27 @@ router.get('/read/:bo_table/:wr_id', async (req, res) => {
     const result = await modelCall(boardModel.getItem, bo_table, wr_id, req.user);
     res.json(result);
 });
+
+router.get('/download/:bo_table/:filename', async (req, res) => {
+    const { bo_table, filename } = req.params;
+    const config = await modelCall(boardModel.getConfig, bo_table);
+    const grant = isGrant(req, config.bo_write_level);
+    if (!grant) {
+        return res.status(403).end('No file download permission');
+    }
+    const { src } = req.query;
+    const srcFile = `${UPLOAD_PATH}/${bo_table}/${src}`;
+    if (!fs.existsSync(srcFile)) {
+        return res.status(404).end("File not found.");
+    }
+    res.download(srcFile, filename);
+    //return res.status(400).json({err : 'file not found'});
+});
+
+router.delete('/:bo_table/:wr_id', async(req, res) => {
+    const {bo_table, wr_id} = req.params;
+    const {token} = req.query;
+    res.json({bo_table, wr_id, token})
+})
 
 module.exports = router;
