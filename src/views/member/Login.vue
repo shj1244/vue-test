@@ -24,7 +24,7 @@
           </v-tab-item>
         </v-tabs-items>
       </v-card-text>
-      <v-card-text class="mt-n4" v-if="config.useLoginGoogle">
+      <v-card-text class="mt-n4" v-if="config.useLoginGoogle"><!-- 사용을 하려면 DB의 config테이블의 cf_val을 1로 바꿈 -->
         <v-btn @click="loginGoogle" block>구글 로그인</v-btn>
       </v-card-text>
       <v-card-text class="mt-n4" v-if="config.useLoginKakao">
