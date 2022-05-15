@@ -36,10 +36,10 @@
           :table="table"
           :item="item"
           class="d-flex justify-center"
-          :btnProps="{tile:true, small:true}"
+          :btnProps="{ tile: true, small: true }"
           :icon="{
-            good : 'mdi-thumb-up',
-            bad : 'mdi-thumb-down'
+            good: 'mdi-thumb-up',
+            bad: 'mdi-thumb-down',
           }"
         />
       </v-card-text>
@@ -60,6 +60,16 @@
           >
           </board-button>
           <!-- TODO: 비회원 게시물 수정 버튼 -->
+          <modify-button
+            v-if="isModify == 'NO_MEMBER'"
+            color="info"
+            :table="table"
+            :wr_id="item.wr_id"
+            label="수정"
+            @onValid="modifyItem"
+          >
+            <v-icon>mdi-pencil</v-icon>수정
+          </modify-button>
 
           <!-- // 수정 -->
 
@@ -110,6 +120,9 @@
           </board-button>
         </v-col>
       </v-card-actions>
+
+      <comment-list :id="item.wr_id" :table="table" :access="access"/>
+
     </v-card>
     <!-- <div>
     Basic Read
@@ -128,7 +141,9 @@ import BoardButton from "./component/boardButton.vue";
 import DisplayGood from "./component/DisplayGood.vue";
 import DisplayTime from "./component/DisplayTime.vue";
 import FileDownload from "./component/FileDownload.vue";
+import ModifyButton from "./component/ModifyButton.vue";
 import TagView from "./component/TagView.vue";
+import CommentList from "./component/CommentList.vue"
 
 export default {
   components: {
@@ -138,6 +153,8 @@ export default {
     FileDownload,
     BoardButton,
     DisplayGood,
+    ModifyButton,
+    CommentList,
   },
   name: "BasicRead",
   props: {
@@ -220,6 +237,12 @@ export default {
         );
       }
       this.deleteLoading = false;
+    },
+    modifyItem(token) {
+      console.log('modifyItem===>',token)
+      this.$router.push(
+        `/board/${this.table}/${this.item.wr_id}?act=write&token=${token}`
+      );
     },
   },
 };

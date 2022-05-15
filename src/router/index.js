@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import routes from './routes';
 import store from '../store';
-import { LV , LV_LABEL} from '../../util/level';
+import { LV, LV_LABEL } from '../../util/level';
 
 Vue.use(VueRouter)
 
@@ -51,22 +51,25 @@ export function createRouter() {
         msg = `${LV_LABEL(accessLV)} 이상 접근 가능합니다.`;
       }
     }
-    if(msg){
+    if (msg) {
       // 접근차단
-      if($toast) $toast.error(msg);
-      if($Progress) $Progress.fail();
-      if(from.name){ // 이전 경로가 있으면 라우팅을 동작하지 않고
-        next(false);
-      }else{ // 이전 경로가 없으면 홈으로 이동 또는 로그인 페이지로 보내도 됨
-        next('/');
+      if ($toast) $toast.error(msg);
+      if ($Progress) $Progress.fail();
+      if (from.name) { // 이전 경로가 있으면 라우팅을 동작하지 않고
+        return isMember ? next('/') : next(false);
+      } else { // 이전 경로가 없으면 홈으로 이동 또는 로그인 페이지로 보내도 됨
+        return isMember ? next('/') : next({
+          name: 'NoAuthLogin',
+          query: { next: to.fullPath }
+        });
       }
-    }else{
+    } else {
       // 통과
       if ($Progress) $Progress.finish();
       next();
     }
 
-    
+
   });
 
   router.afterEach((to, from) => {

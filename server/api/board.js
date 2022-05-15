@@ -3,8 +3,10 @@ const router = require('express').Router();
 const { isGrant, LV } = require('../../util/level');
 const { modelCall, getIp } = require('../../util/lib');
 const boardModel = require('./_model/boardModel');
+const jwt = require('../plugins/jwt');
 
-async function isModify(config, member, data) {
+async function isModify(req, config, member, wrItem) {
+    console.log("token", wrItem.token, req.session.checkToken);
     let msg = '수정권한이 없습니다.';
     if (member) {
         if (member.mb_level >= LV.SUPER || member.mb_id == wrItem.mb_id) {
@@ -12,8 +14,13 @@ async function isModify(config, member, data) {
         }
     } else { // 비회원
         // 세션에 비밀번호 정보를 입력
-        // TODO : 비밀번호가 맞는지 확인.
+        if(typeof (wrItem.token) === 'string' && wrItem.token === req.session.checkToken){
+            msg = '';
+        }
     }
+    
+    delete wrItem.token;
+    req.session.checkToken = '';
     return msg;
 }
 
@@ -69,8 +76,9 @@ router.put('/write/:bo_table/:wr_id', async (req, res) => {
     data.wr_ip = getIp(req);
     // 권한 확인
     const config = await modelCall(boardModel.getConfig, bo_table);
-    const modifyMsg = await isModify(config, req.user, data);
-    if (modifyMsg) {
+    const modifyMsg = await isModify(req, config, req.user, data);
+
+    if (modifyMsg) { // 에러메시지가 있으면 에러
         return res.json({ err: modifyMsg });
     }
 
@@ -80,6 +88,7 @@ router.put('/write/:bo_table/:wr_id', async (req, res) => {
 
 // 게시판 목록 반환
 router.get('/list/:bo_table', async (req, res) => {
+
     const { bo_table } = req.params;
     // 설정파일 불러와서 쓰기권한이 있는지 체크
     const config = await modelCall(boardModel.getConfig, bo_table);
@@ -123,10 +132,26 @@ router.get('/download/:bo_table/:filename', async (req, res) => {
     //return res.status(400).json({err : 'file not found'});
 });
 
-router.delete('/:bo_table/:wr_id', async(req, res) => {
-    const {bo_table, wr_id} = req.params;
-    const {token} = req.query;
-    res.json({bo_table, wr_id, token})
+router.delete('/:bo_table/:wr_id', async (req, res) => {
+    const { bo_table, wr_id } = req.params;
+    const { token } = req.query;
+    res.json({ bo_table, wr_id, token })
 })
+
+router.post('/check/:bo_table/:wr_id', async (req, res) => {
+    const { bo_table, wr_id } = req.params;
+    const { password } = req.body;
+
+    const cnt = await modelCall(boardModel.checkItem, bo_table, wr_id, password);
+    if (cnt == 1) {
+        //console.log("cnt===>",cnt);
+        const token = jwt.getRandToken(16);
+        req.session.checkToken = token;
+        console.log(token)
+        res.json({ token })
+    } else {
+        res.json({ err: '비밀번호가 올바르지 않습니다.' });
+    }
+});
 
 module.exports = router;

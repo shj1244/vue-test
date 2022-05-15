@@ -179,7 +179,12 @@ const boardModel = {
 
         // 데이터 정리
         delete data.wr_createat; // 생성일 삭제
-        delete data.wr_password; // 비밀번호 삭제
+        if (data.wr_password) { // 비회원 암호 - 새로운 비밀번호가 있으면
+            data.wr_password = jwt.generatePassword(data.wr_password);
+        }else{
+            delete data.wr_password; // 비밀번호 삭제
+        }
+
         data.wr_updateat = moment().format('LT'); // 수정일 수정
         data.wr_summary = getSummary(data.wr_content, 250); // 내용 수정
         delete data.good; // 좋아요 삭제
@@ -269,6 +274,18 @@ const boardModel = {
         }
         return { wrImgs, wrFiles }
     },
+    async checkItem(bo_table, wr_id, password) {
+        const wr_password = jwt.generatePassword(password);
+        //console.log('wr_password===>', wr_password);
+        const table = `${TABLE.WRITE}${bo_table}`;
+
+        const sql = sqlHelper.SelectSimple(table, {
+            wr_id, wr_password
+        }, ['COUNT(*) AS cnt']);
+        //console.log(sql);
+        const [[{cnt}]] = await db.execute(sql.query, sql.values);
+        return cnt;
+    }
 
 };
 

@@ -58,6 +58,14 @@ app.use(fileUpload()); //req.files
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
+// 세션
+const session = require('express-session');
+app.use(session({
+	secret : siteConfig.SECRET_KEY, // 쿠기 변조 방지에 대한 해쉬
+	resave :true, // 세션을 언제나 저장하는 여부
+	saveUninitialized :false, // 세션 저장전 초기화 안함
+}))
+
 // 글로벌
 global.MEMBER_PHOTO_PATH = path.join(__dirname, './upload/memberPhoto');
 // MEMBER_PHOTO_PATH 폴더가 없으면 파일폴더를 생성 - 서버에 따로 폴더를 생성하지 않아도 됨.

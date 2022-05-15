@@ -17,14 +17,15 @@
             <sign-in-form @save="loginLocal" :isLoading="isLoading" />
           </v-tab-item>
           <v-tab-item>
-            <find-id-form @save="findId" :isLoading="isLoading"/>
+            <find-id-form @save="findId" :isLoading="isLoading" />
           </v-tab-item>
           <v-tab-item>
-            <find-pw-form @save="findPw" :isLoading="isLoading"/>
+            <find-pw-form @save="findPw" :isLoading="isLoading" />
           </v-tab-item>
         </v-tabs-items>
       </v-card-text>
-      <v-card-text class="mt-n4" v-if="config.useLoginGoogle"><!-- 사용을 하려면 DB의 config테이블의 cf_val을 1로 바꿈 -->
+      <v-card-text class="mt-n4" v-if="config.useLoginGoogle"
+        ><!-- 사용을 하려면 DB의 config테이블의 cf_val을 1로 바꿈 -->
         <v-btn @click="loginGoogle" block>구글 로그인</v-btn>
       </v-card-text>
       <v-card-text class="mt-n4" v-if="config.useLoginKakao">
@@ -41,9 +42,9 @@
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex"
-import FindIdForm from '../../components/Auth/FindIdForm.vue';
-import FindPwForm from '../../components/Auth/FindPwForm.vue';
+import { mapActions, mapState } from "vuex";
+import FindIdForm from "../../components/Auth/FindIdForm.vue";
+import FindPwForm from "../../components/Auth/FindPwForm.vue";
 import SignInForm from "../../components/Auth/SignInForm.vue";
 import SiteTitle from "../../components/layout/SiteTitle.vue";
 export default {
@@ -63,39 +64,49 @@ export default {
     }),
   },
   methods: {
-    ...mapActions('user', ['signInLocal','findIdLocal','findPwLocal', 'signInSocial']),
+    ...mapActions("user", [
+      "signInLocal",
+      "findIdLocal",
+      "findPwLocal",
+      "signInSocial",
+    ]),
+    routerNext() {
+      const next = this.$route.query.next || "/";
+      this.$router.push(next);
+    },
     async loginLocal(form) {
       this.isLoading = true;
       //console.log("loginLocal form", form);
       const data = await this.signInLocal(form);
       this.isLoading = false;
       //console.log("loginLocal data", data);
-      if(data){
-        this.$router.push('/');
+      if (data) {
+        //this.$router.push('/');
         this.$toast.info(
           `${this.$store.state.user.member.mb_name}님 환영합니다.`
         );
+        this.routerNext();
       }
     },
-    async findId(form){
+    async findId(form) {
       this.isLoading = true;
       const data = await this.findIdLocal(form);
       this.isLoading = false;
       //console.log("loginLocal data", data);
-      if(data && data.mb_id){
+      if (data && data.mb_id) {
         await this.$ezNotify.alert(
-          `<span style="font-size:1.5em">회원아이디 : [ <b>${data.mb_id}</b> ] 입니다.</span>`, 
+          `<span style="font-size:1.5em">회원아이디 : [ <b>${data.mb_id}</b> ] 입니다.</span>`,
           "아이디 찾기 결과"
         );
         // 로그인 페이지로 이동
         this.tabs = 0;
       }
     },
-    async findPw(form){
+    async findPw(form) {
       this.isLoading = true;
       const data = await this.findPwLocal(form);
       this.isLoading = false;
-      if(data && data.mb_name){
+      if (data && data.mb_name) {
         await this.$ezNotify.alert(
           `${data.mb_name}님<br><b>${form.mb_email}</b>로 이메일을 발송하였습니다.`,
           "이메일 발송 성공"
@@ -103,29 +114,29 @@ export default {
         this.tabs = 0;
       }
     },
-    socialPopup(url){
-        const childWindow = window.open(
+    socialPopup(url) {
+      const childWindow = window.open(
         url,
         "auth",
         "top=10, left=10, width=500, height=600, status=no, menubar=no, toolbar=no, resizable=no"
       );
       //window.addEventListener('message', this.googleLoginCallback, false);
-      if(!window.onSocialCallback){
+      if (!window.onSocialCallback) {
         window.onSocialCallback = this.socialCallback;
       }
     },
-    loginGoogle(){
+    loginGoogle() {
       this.socialPopup("/api/member/loginGoogle");
     },
-    loginKakao(){
+    loginKakao() {
       this.socialPopup("/api/member/loginKakao");
     },
-    loginNaver(){
+    loginNaver() {
       this.socialPopup("/api/member/loginNaver");
     },
-    socialCallback(payload){
+    socialCallback(payload) {
       //console.log("Callback payload===>",payload);
-      if(payload.err){
+      if (payload.err) {
         this.$toast.error(payload.err);
       } else {
         this.signInSocial(payload);
@@ -133,13 +144,14 @@ export default {
         // this.SET_TOKEN(payload.token);
         // 최초 로그인 경우 정보를 변경하는 페이지로 이동
 
-        this.$router.push('/');
+        //this.$router.push("/");
         this.$toast.info(
           `${this.$store.state.user.member.mb_name}님 환영합니다.`
-        );        
+        );
+        this.routerNext();
       }
       //window.removeEventListener('message', this.googleLoginCallback);
-    }
+    },
   },
 };
 </script>
