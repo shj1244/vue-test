@@ -84,19 +84,29 @@ const boardModel = {
     },
     async writeInsert(bo_table, data, files) {
         // 에디터에서 업로드 한 이미지 목록
-        const upImages = JSON.parse(data.upImages);
+        let upImages = [];
+        if (data.upImages) {
+            upImages = JSON.parse(data.upImages);
+        }
+        //const upImages = JSON.parse(data.upImages);
         delete data.upImages;
         // 태그 목록
+
         //console.log("data.wrTags===>", typeof data, "...wrTags==>", data.wrTags);
-        const wrTags = JSON.parse(data.wrTags);
-        //console.log("wrTags===>", wrTags);
-        delete data.wrTags;
+        let wrTags = [];
+        if (data.wrTags) {
+            wrTags = JSON.parse(data.wrTags);
+            //console.log("wrTags===>", wrTags);
+            delete data.wrTags;
+        }
+
+
         // 게시판 테이블 명
         const table = `${TABLE.WRITE}${bo_table}`;
 
         // 게시글에 대한 그룹 , 정렬, 깊이
         if (data.wr_parent == 0) { // 새글
-            const grpQuery = `SELECT MAX(wr_grp) AS wr_grp FROM ${table}`;
+            const grpQuery = `SELECT MAX(wr_grp) AS wr_grp FROM ${table} WHERE wr_reply=${data.wr_reply}`;
             let [[{ wr_grp }]] = await db.execute(grpQuery);
             data.wr_grp = wr_grp ? wr_grp + 1 : 1;
             data.wr_order = 0;
@@ -152,8 +162,11 @@ const boardModel = {
         delete data.wr_id;
 
         // 기존 첨부파일
-        const wrFiles = JSON.parse(data.wrFiles);
-        delete data.wrFiles;
+        let wrFiles = [];
+        if (data.wrFiles) {
+            const wrFiles = JSON.parse(data.wrFiles);
+            delete data.wrFiles;
+        }
 
         // 기존 첨부파일에서 삭제가 침인거
         for (const wrFile of wrFiles) {
@@ -172,16 +185,21 @@ const boardModel = {
         }
 
         // 에디터에서 업로드한 이미지 처리
-        const upImages = JSON.parse(data.upImages).concat(JSON.parse(data.wrImgs));
-        delete data.upImages;
-        delete data.wrImgs;
+        let upImages = [];
+        if (data.upImages && data.wrImgs) {
+            upImages = JSON.parse(data.upImages).concat(JSON.parse(data.wrImgs));
+            delete data.upImages;
+            delete data.wrImgs;
+        }
+
+
         await boardModel.clearImages(bo_table, wr_id, data.wr_content, upImages);
 
         // 데이터 정리
         delete data.wr_createat; // 생성일 삭제
         if (data.wr_password) { // 비회원 암호 - 새로운 비밀번호가 있으면
             data.wr_password = jwt.generatePassword(data.wr_password);
-        }else{
+        } else {
             delete data.wr_password; // 비밀번호 삭제
         }
 
@@ -193,8 +211,12 @@ const boardModel = {
         delete data.goodFlag; //  삭제
 
         // 태그
-        const wrTags = JSON.parse(data.wrTags);
-        delete data.wrTags;
+        let wrTags = [];
+        if (data.wrTags) {
+            wrTags = JSON.parse(data.wrTags);
+            delete data.wrTags;
+        }
+        
         await tagModel.registerTags(bo_table, wr_id, wrTags);
 
         const sql = sqlHelper.Update(table, data, { wr_id });
@@ -283,7 +305,7 @@ const boardModel = {
             wr_id, wr_password
         }, ['COUNT(*) AS cnt']);
         //console.log(sql);
-        const [[{cnt}]] = await db.execute(sql.query, sql.values);
+        const [[{ cnt }]] = await db.execute(sql.query, sql.values);
         return cnt;
     }
 

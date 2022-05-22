@@ -14,11 +14,11 @@ async function isModify(req, config, member, wrItem) {
         }
     } else { // 비회원
         // 세션에 비밀번호 정보를 입력
-        if(typeof (wrItem.token) === 'string' && wrItem.token === req.session.checkToken){
+        if (typeof (wrItem.token) === 'string' && wrItem.token === req.session.checkToken) {
             msg = '';
         }
     }
-    
+
     delete wrItem.token;
     req.session.checkToken = '';
     return msg;
@@ -58,14 +58,36 @@ router.post('/write/:bo_table', async (req, res) => {
 
     // 설정파일 불러와서 쓰기권한이 있는지 체크
     const config = await modelCall(boardModel.getConfig, bo_table);
-    const grant = isGrant(req, config.bo_write_level);
-    if (!grant) {
-        return res.json({ err: '게시물 작성 권한이 없습니다.' });
+    // return res.json({err : '작업중', data});
+
+    if (data.wr_reply == 0) {
+        const grant = isGrant(req, config.bo_write_level);
+        if (!grant) {
+            return res.json({ err: '게시물 작성 권한이 없습니다.' });
+        }
+    } else {
+        const grant = isGrant(req, config.bo_comment_level);
+        if (!grant) {
+            return res.json({ err: '덧글 작성 권한이 없습니다.' });
+        }
     }
+
+    //const grant = isGrant(req, config.bo_write_level);
+
     //console.log("data===>",typeof data, "...data",data);
 
     const result = await modelCall(boardModel.writeInsert, bo_table, data, req.files);
-    res.json(result);
+    if (data.wr_reply > 0) { // comment에 내용을 주자
+        const options = {
+            stf: ['wr_id'],
+            stc: ['eq'],
+            stx: [result.wr_id]
+        };
+        const item = await modelCall(boardModel.getList, bo_table, config, options, req.user);
+        res.json(item.items[0]);
+    } else {
+        res.json(result);
+    }
 });
 
 // 게시물 수정
@@ -83,7 +105,18 @@ router.put('/write/:bo_table/:wr_id', async (req, res) => {
     }
 
     const result = await modelCall(boardModel.writeUpdate, bo_table, wr_id, data, req.files);
-    res.json(result);
+
+    if (data.wr_reply > 0) { // comment에 내용을 주자
+        const options = {
+            stf: ['wr_id'],
+            stc: ['eq'],
+            stx: [result.wr_id]
+        };
+        const item = await modelCall(boardModel.getList, bo_table, config, options, req.user);
+        res.json(item.items[0]);
+    } else {
+        res.json(result);
+    }
 });
 
 // 게시판 목록 반환
@@ -97,6 +130,8 @@ router.get('/list/:bo_table', async (req, res) => {
         return res.json({ err: '게시물 목록 보기 권한이 없습니다.' });
     }
     const options = req.query;
+
+    //return res.json({err:'작업중...', options});
     const result = await modelCall(boardModel.getList, bo_table, config, options, req.user);
     res.json(result);
 });
