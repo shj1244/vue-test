@@ -112,9 +112,10 @@ const sqlHelper = {
 
         // 페이지 네이션
         let limit = "";
-        if (options.page && options.itemsPerPage) {
+        //if (options.page && options.itemsPerPage) {
+        if (options.itemsPerPage) {
             if (options.itemsPerPage > 0) {
-                const start = (options.page - 1) * options.itemsPerPage;
+                const start = options.limitStart || (options.page - 1) * options.itemsPerPage;
                 limit = ` LIMIT ${start}, ${options.itemsPerPage} `;
             }
         }

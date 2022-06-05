@@ -15,7 +15,7 @@
       <span>좋아요</span>
     </v-tooltip>
 
-    <v-tooltip top>
+    <v-tooltip v-if="!goodOnly" top>
       <template v-slot:activator="{ on, attrs }">
         <v-btn
           v-on="on"
@@ -52,10 +52,14 @@ export default {
     },
     icon: {
       type: Object,
-      default: {
+      default: () => ({
         good: "mdi-heart-outline",
         bad: "mdi-heart-broken-outline",
-      },
+      }),
+    },
+    goodOnly: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {

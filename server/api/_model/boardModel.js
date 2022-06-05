@@ -249,6 +249,15 @@ const boardModel = {
 
         const sql = sqlHelper.SelectLimit(table, options);
         const [items] = await db.execute(sql.query, sql.values);
+
+        for (const item of items) {
+			if (member) {
+				item.goodFlag = await goodModel.getFlag(bo_table, item.wr_id, member.mb_id);
+			} else {
+				item.goodFlag = 0;
+			}
+		}
+
         const [[{ totalItems }]] = await db.execute(sql.countQuery, sql.values);
 
         return { items, totalItems };
@@ -307,6 +316,65 @@ const boardModel = {
         //console.log(sql);
         const [[{ cnt }]] = await db.execute(sql.query, sql.values);
         return cnt;
+    },
+    async deleteItem(bo_table, wr_id, member) {
+		let delCnt = 0;
+		const table = `${TABLE.WRITE}${bo_table}`;
+		// 답글 목록을 가져오고요
+		const cSql = sqlHelper.SelectSimple(table, { wr_parent: wr_id }, ['wr_id']);
+		const [children] = await db.execute(cSql.query, cSql.values);
+		// 최고관리자 이면 다 지울꺼고
+		if (member && member.mb_level >= LV.SUPER) {
+			// 자식들 모두 반복해서 삭제
+			for (const child of children) {
+				delCnt += await boardModel.deleteItem(bo_table, child.wr_id, member);
+			}
+			delCnt += await boardModel.removeItem(bo_table, wr_id);
+		} else {	// 아니면 
+			if (children.length == 0) { // 답글 없으면
+				// 코멘트 가 있으면 에러
+				const rSql = sqlHelper.SelectSimple(table, { wr_reply: wr_id }, ['wr_id']);
+				const [commentList] = await db.execute(rSql.query, rSql.values);
+				if (commentList.length == 0) {
+					delCnt += await boardModel.removeItem(bo_table, wr_id);
+				} else {
+					throw new Error('댓글이 있어 삭제할 수 없습니다.');
+				}
+			} else {
+				throw new Error('답글이 있어 삭제할 수 없습니다.');
+			}
+		}
+		return delCnt;
+	},
+	async removeItem(bo_table, wr_id) {
+		const table = `${TABLE.WRITE}${bo_table}`;
+		// 태그 목록 삭제
+		await tagModel.deleteTags(bo_table, wr_id);
+		// 관련 파일 삭제
+		const fSql = sqlHelper.SelectSimple(TABLE.BOARD_FILE, {
+			bo_table, wr_id
+		}, ['bf_id', 'bf_src']);
+		const [files] = await db.execute(fSql.query, fSql.values);
+		for (const file of files) {
+			await boardModel.removeFile(bo_table, file);
+		}
+		// 댓글 있으면 댓글도 삭제
+		const cSql = sqlHelper.DeleteSimple(table, { wr_reply: wr_id });
+		await db.execute(cSql.query, cSql.values);
+
+		// 게시물 삭제
+		const sql = sqlHelper.DeleteSimple(table, { wr_id });
+		const [rows] = await db.execute(sql.query, sql.values);
+
+		return rows.affectedRows;
+	},
+
+    async viewUp(bo_table, wr_id){
+        const table = `${TABLE.WRITE}${bo_table}`;
+        const query = `UPDATE ${table} SET wr_view = wr_view+1 WHERE wr_id=?`
+        const values = [wr_id];
+        const [rows] = await db.execute(query, values);
+        return rows.affectedRows;
     }
 
 };

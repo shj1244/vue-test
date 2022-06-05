@@ -11,6 +11,11 @@ const app = express();
 const port = process.env.VUE_APP_SERVER_PORT || 3000;
 const webServer = http.createServer(app);
 
+
+// logger
+const logger = require('./plugins/logger');
+global.$logger = logger;
+
 const socket = require('./plugins/socket');
 socket(webServer);
 
@@ -122,9 +127,11 @@ app.get('*', (req, res) => {
 	stream.on('end', () => {
 		const memSize = Object.entries(process.memoryUsage())[0][1];
 		//console.log("스트림 렌더 종료 MemSize", (memSize / 1024 / 1024).toFixed(4));
+		$logger.info("스트림 렌더 종료 MemSize", (memSize / 1024 / 1024).toFixed(4));
 			
 		if(process.platform == 'linux'){
 			if(memSize > 150000000) {
+				$logger.info('서버재시작');
 				process.emit('SIGINT');
 			}
 		}
@@ -134,7 +141,7 @@ app.get('*', (req, res) => {
 // 서버 응답
 webServer.listen(port, () => {
 	process.send('ready');
-	console.log(`http://localhost:${port}`)
+	$logger.info(`http://localhost:${port} 서버시작`)
 });
 
 

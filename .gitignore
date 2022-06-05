@@ -1,6 +1,8 @@
 .DS_Store
 node_modules
-
+/Oraclekey
+/server/upload
+/server/logs
 
 # local env files
 .env.local

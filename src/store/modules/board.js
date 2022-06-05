@@ -20,6 +20,11 @@ export const mutations = {
     SET_READ(state, read) {
         state.read = read;
     },
+    VIEW_UP(state) {
+        if (state.read) {
+            state.read.wr_view++;
+        }
+    }
 
 };
 
@@ -64,7 +69,8 @@ export const actions = {
             { headers }
         );
         if (data) {
-            commit('SET_READ', data)
+
+            commit('SET_READ', data);
         }
     }
 }

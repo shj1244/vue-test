@@ -1,8 +1,8 @@
 <template>
   <div>
     <v-divider />
-    <v-list-item>
-      <div>
+    <v-list-item class="align-start">
+      <div style="position: relative; top: 22px; left: -4px">
         <v-icon
           v-if="item.wr_dep > 0"
           :style="{
@@ -13,15 +13,25 @@
         </v-icon>
       </div>
       <v-list-item-content>
-        <v-subheader>
-          <v-avatar size="28" color="primary">{{ item.wr_name[0] }}</v-avatar>
-          <div>
+        <v-subheader class="pl-0">
+          <v-avatar size="28" color="primary" class="white--text">
+            {{ item.wr_name[0] }}
+          </v-avatar>
+          <div class="ml-2">
             {{ item.wr_name }}
-            <i>{{ item.wr_email }}</i>
+            <i class="ml-2">{{ item.wr_email }}</i>
+            {{ item.wr_id }}
           </div>
           <v-spacer />
           <v-icon small>mdi-clock-alert-outline</v-icon>
           <display-time :time="item.wr_createat" />
+          <display-good
+            :item="item"
+            :table="table"
+            class="ml-4"
+            good-only
+            :btnProps="{ plain: true }"
+          />
         </v-subheader>
 
         <comment-form
@@ -34,7 +44,14 @@
           @onUpdate="modifyComment"
         />
 
-        <div v-else class="text-pre">{{ item.wr_content }}</div>
+        <div
+          v-else
+          class="text-pre"
+          :style="{
+            'font-size': '1.25em',
+            'line-height': '1.5em',
+          }"
+        >{{ item.wr_content }}</div>
 
         <div class="d-flex">
           <board-button
@@ -78,9 +95,10 @@ import { mapGetters, mapState } from "vuex";
 import DisplayTime from "./DisplayTime.vue";
 import boardButton from "./boardButton.vue";
 import CommentForm from "./CommentForm.vue";
+import DisplayGood from "./DisplayGood.vue";
 import { LV } from "../../../../../../util/level";
 export default {
-  components: { DisplayTime, boardButton, CommentForm },
+  components: { DisplayTime, boardButton, CommentForm, DisplayGood },
   name: "CommentItem",
   props: {
     item: { type: Object, required: true },
@@ -113,9 +131,24 @@ export default {
     inComment(child) {
       this.$emit("onInComment", this.item, child);
     },
-    modifyComment(item){
-        this.$emit('onUpdate', item)
-    }
+    modifyComment(item) {
+      this.$emit("onUpdate", item);
+    },
+    async removeComment(item) {
+      const result = await this.$ezNotify.confirm(
+        "댓글을 삭제 하시겠습니까?",
+        "댓글 삭제",
+        { icon: "mdi-alert" }
+      );
+      if (!result) return;
+      const data = await this.$axios.delete(
+        `/api/board/${this.table}/${item.wr_id}`
+      );
+      if (data) {
+        this.$toast.info(`${data}개의 댓글을 삭제 하였습니다.`);
+        this.$emit('onRemove', item, data);
+      }
+    },
   },
 };
 </script>
