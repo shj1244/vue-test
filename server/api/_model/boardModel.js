@@ -16,9 +16,9 @@ const boardModel = {
     async getConfig(bo_table) {
         //console.log("board.js boardmodel bo_table==>",bo_table);
         const sql = sqlHelper.SelectSimple(TABLE.BOARD, { bo_table });
-        //console.log("board.js boardmodel sql==>",sql);
+        console.log("board.js boardmodel sql==>",sql);
         const [[row]] = await db.execute(sql.query, sql.values);
-        //console.log("board.js boardmodel row==>",row);
+        console.log("board.js boardmodel row==>",row);
         if (!row) {
             throw new Error(`${bo_table} 게시판이 없습니다.`);
         }

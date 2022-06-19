@@ -38,10 +38,35 @@ const lib = {
         }
         return text;
     },
-    filesize(size){
+    filesize(size) {
         const s = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
         const e = Math.floor(Math.log(size) / Math.log(1024));
         return (size / Math.pow(1024, e)).toFixed(2) + " " + s[e];
+    },
+    getImage(table, item, imgSize) {
+        // 본문에 업로드된 이미지
+        if (item.wrImgs.length) {
+            return `/upload/${table}/${item.wrImgs[0].bf_src}?w=${imgSize.w}&h=${imgSize.h}`;
+        }
+        // 첨부파일에 업로드된 이미지
+        if (item.wrFiles.length) {
+            for (const file of item.wrFiles) {
+                if (file.bf_type.startsWith("image")) {
+                    return `/upload/${table}/${file.bf_src}?w=${imgSize.w}&h=${imgSize.h}`;
+                }
+            }
+        }
+
+        // 본문에 URL 링크로 올린이미지
+        //const pattern = /<img[^>]*src=[\"]?([^\"]+)[\"]?[^>]*>/;
+        const pattern = /<img[^>]*src=\"([^\"]+)\"[^>]*>/;
+        const matchs = item.wr_content.match(pattern);
+        //console.log('비교', matchs);
+        if (matchs) {
+            return matchs[1];
+        }
+        // 없으면 기본이미지
+        return "/img/no_image.png";
     }
 }
 

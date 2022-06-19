@@ -6,6 +6,7 @@ export const state = () => ({
     list: [],
     totalItems: 0,
     read: null,
+    latest: {},
 });
 
 export const mutations = {
@@ -24,7 +25,10 @@ export const mutations = {
         if (state.read) {
             state.read.wr_view++;
         }
-    }
+    },
+    SET_LATEST(state, { table, payload }) {
+        Vue.set(state.latest, table, payload);
+    },
 
 };
 
@@ -72,5 +76,17 @@ export const actions = {
 
             commit('SET_READ', data);
         }
-    }
+    },
+    async getLatest({ commit }, { table, limit }) {
+        const { $axios } = Vue.prototype;
+        //console.log("limits ====>",limit);
+        const data = await $axios.get(`/api/board/latest/${table}?limit=${limit}`)
+        //console.log("data ====>",data);
+        if(data){
+            commit('SET_LATEST', {table, payload: data});
+        }
+        /*
+        latest: {table : {subject : "", items: []}}
+        */
+    },
 }
