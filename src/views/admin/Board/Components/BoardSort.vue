@@ -158,7 +158,7 @@ export default {
       this.$refs.form.resetValidation();
     },
     removeItem(idx) {
-      this.item.splice(idx, 1);
+      this.items.splice(idx, 1);
     },
   },
 };

@@ -6,10 +6,12 @@ const boardModel = require('./_model/boardModel');
 const jwt = require('../plugins/jwt');
 
 async function isModify(req, config, member, wrItem) {
-    console.log("token", wrItem.token, req.session.checkToken);
+    //console.log("token", wrItem.token, req.session.checkToken);
     let msg = '수정권한이 없습니다.';
     if (member) {
-        if (member.mb_level >= LV.SUPER || member.mb_id == wrItem.mb_id) {
+        if(config.bo_table == 'popup' && member.mb_level >= LV.ADMIN){
+            msg = '';
+        }else if (member.mb_level >= LV.SUPER || member.mb_id == wrItem.mb_id) {
             msg = '';
         }
     } else { // 비회원

@@ -44,6 +44,7 @@ export default {
         { title: "회원 관리", icon: "mdi-account-cog", to: "/adm/member" },
         { title: "메뉴 관리", icon: "mdi-menu", to: "/adm/menu" },
         { title: "게시판 관리", icon: "mdi-clipboard-text-multiple-outline", to: "/adm/board/list" },
+        { title: "팝업 관리", icon: "mdi-layers-triple-outline", to: "/board/popup" },
       ],
     };
   },
