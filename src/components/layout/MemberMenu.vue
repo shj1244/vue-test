@@ -2,8 +2,8 @@
   <div>
     <!-- 회원정보 출력 -->
     <v-card-text class="text-subtitle-1">
-        <b>{{member.mb_name}}</b>
-        ({{LV_LABEL(member.mb_level)}})
+      <b>{{ member.mb_name }}</b>
+      ({{ LV_LABEL(member.mb_level) }})
     </v-card-text>
     <!-- 관리자메뉴 -->
     <v-list v-if="isAdmin" dense>
@@ -43,8 +43,21 @@ export default {
         { title: "설정 관리", icon: "mdi-cog", to: "/adm/config" },
         { title: "회원 관리", icon: "mdi-account-cog", to: "/adm/member" },
         { title: "메뉴 관리", icon: "mdi-menu", to: "/adm/menu" },
-        { title: "게시판 관리", icon: "mdi-clipboard-text-multiple-outline", to: "/adm/board/list" },
-        { title: "팝업 관리", icon: "mdi-layers-triple-outline", to: "/board/popup" },
+        {
+          title: "게시판 관리",
+          icon: "mdi-clipboard-text-multiple-outline",
+          to: "/adm/board/list",
+        },
+        {
+          title: "내용 관리",
+          icon: "mdi-content-paste",
+          to: "/board/contents",
+        },
+        {
+          title: "팝업 관리",
+          icon: "mdi-layers-triple-outline",
+          to: "/board/popup",
+        },
       ],
     };
   },

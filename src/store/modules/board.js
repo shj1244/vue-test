@@ -73,6 +73,16 @@ export const actions = {
             { headers }
         );
         if (data) {
+            commit('SET_READ', data);
+        }
+    },
+    async getContentsRead({ commit }, { wr_1, headers }) {
+        const { $axios } = Vue.prototype;
+        const data = await $axios.get(
+            `/api/contents/${wr_1}`,
+            { headers }
+        );
+        if (data) {
 
             commit('SET_READ', data);
         }
